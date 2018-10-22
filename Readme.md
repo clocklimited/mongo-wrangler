@@ -34,7 +34,7 @@ To keep customer data safe and reduce the liability on developers, live database
 
 2. If this is your first dump 💩
 
-    git clone git@github.com:clocklimited/mongo-wrangler.git
+    `git clone git@github.com:clocklimited/mongo-wrangler.git`
 
 3. `cd mongo-wrangler`
 
@@ -48,7 +48,7 @@ To keep customer data safe and reduce the liability on developers, live database
 
 1. If this is your first restore
 
-    git remote add origin git@github.com:clocklimited/mongo-wrangler.git
+    `git clone git@github.com:clocklimited/mongo-wrangler.git`
 
 2. `cd mongo-wrangler`
 
