@@ -1,8 +1,8 @@
 # Mongo Wrangler
 
-**Two developers one dump 💩**
+Lightweight copies of databases with personal data obfuscated.
 
-Giving developers lightweight copies of databases with personal data obfuscated.
+**Two developers one dump 💩**
 
 To keep customer data safe and reduce the liability on developers, live database access is only granted to people who really need it for operational support. You really don't want to be in that group, you'll get called at all hours and be asked to help solve horrible problems for angry customers and bosses.
 
