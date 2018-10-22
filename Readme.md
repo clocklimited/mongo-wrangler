@@ -1,6 +1,8 @@
-# Mongo Rangler
+# Mongo Wrangler
 
 **Two developers one dump 💩**
+
+Giving developers lightweight copies of databases with personal data obfuscated.
 
 To keep customer data safe and reduce the liability on developers, live database access is only granted to people who really need it for operational support. You really don't want to be in that group, you'll get called at all hours and be asked to help solve horrible problems for angry customers and bosses.
 
@@ -54,3 +56,24 @@ To keep customer data safe and reduce the liability on developers, live database
 
 4. 🎉
 
+## Excluded Collections
+
+[These collections](dump.js#L5) are excluded by default. If you need them please ask the privileged user to include them by editing the dump script.
+
+If you find other big collections that are slowing up your dumps or taking a lot of space please send a PR or edit `dump.js` on a per project bases.
+
+## Obfuscation
+
+Properties containing [these properties](obfuscate.js#L1) are obfuscated by default. This can cause some data you don't want getting obfuscated. You'll have to ask the privileged to do a customer dump or submit a PR if this causes a problem.
+
+## Troubleshooting
+
+### You need to be on node 0.11+
+
+You should be able to do to get a newer runtime:
+
+`nave use stable`
+
+### Xfer
+
+This solution relies on [xfer.clock.co.uk](https://xfer.clock.co.uk)
