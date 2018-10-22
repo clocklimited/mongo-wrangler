@@ -34,7 +34,7 @@ To keep customer data safe and reduce the liability on developers, live database
 
 2. If this is your first dump 💩
 
-    `git clone git@github.com:clocklimited/mongo-wrangler.git`
+    `git clone https://github.com/clocklimited/mongo-wrangler.git`
 
 3. `cd mongo-wrangler`
 
@@ -46,15 +46,9 @@ To keep customer data safe and reduce the liability on developers, live database
 
 ## Request / Restorer
 
-1. If this is your first restore
+1. Paste oneliner sent to you.
 
-    `git clone git@github.com:clocklimited/mongo-wrangler.git`
-
-2. `cd mongo-wrangler`
-
-3. Paste oneliner sent to you
-
-4. 🎉
+2. 🎉
 
 ## Excluded Collections
 
@@ -73,6 +67,13 @@ Properties containing [these properties](obfuscate.js#L1) are obfuscated by defa
 You should be able to do to get a newer runtime:
 
 `nave use stable`
+
+### No `node` no `nave`
+
+```
+wget http://github.com/isaacs/nave/raw/master/nave.sh
+bash ./nave.sh use stable
+```
 
 ### Xfer
 
