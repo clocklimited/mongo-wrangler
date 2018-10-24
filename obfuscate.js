@@ -18,10 +18,12 @@ function isPrivate (propertyName) {
 }
 
 function isClock (document) {
-  Object.keys(document).some(function (key) {
-    var value = document[key]
+  var value = false
+  var found = Object.keys(document).some(function (key) {
+    value = document[key]
     return typeof value === 'string' && value.toLowerCase().indexOf('clock.co.uk') !== -1
   })
+  return found ? value : false
 }
 
 var lowerChars = 'abcdefghijklmnopqrstuvwxyz'
@@ -51,7 +53,11 @@ db.getCollectionNames().forEach(function (collectionName) {
   var counter = 0
   collection.find({}).forEach(function (document) {
     var found = false
-    if (isClock(document)) return
+    var clockValue = isClock(document)
+    if (clockValue) {
+      print('Skiping document containing ' + clockValue + ' from collection ' + collectionName)
+      return false
+    }
     Object.keys(document).forEach(function (key) {
       if (typeof document[key] === 'string' && isPrivate(key)) {
         found = true
