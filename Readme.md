@@ -52,7 +52,7 @@ To keep customer data safe and reduce the liability on developers, live database
 
 ## Excluded Collections
 
-[These collections](dump.js#L5) are excluded by default. If you need them please ask the privileged user to include them by editing the dump script.
+[These collections](dump.js#L21-L27) are excluded by default. If you need them please ask the privileged user to include them by editing the dump script.
 
 If you find other big collections that are slowing up your dumps or taking a lot of space please send a PR or edit `dump.js` on a per project bases.
 
