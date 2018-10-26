@@ -49,7 +49,7 @@ var tarFilename = newDatabaseName + '.tar.bz'
 var likelyRestoreName = databaseName.replace(/(staging|production)$/, 'development')
 console.log(color('\n💩\tDumping', 'grey'), color(databaseName, 'yellow'))
 console.log(color('\n❌\tExcluding collections', 'grey'), color(excludeCollections.join(', '), 'green'))
-
+exec('rm -rf dump')
 if (supportCollectionExclude) {
   exec('mongodump ' + (!verbose ?'--quiet' : '') + ' --db ' + databaseName + ' ' + excludeCollections.map(function (collection) { return '--excludeCollection ' + collection }).join(' '))
 } else {
