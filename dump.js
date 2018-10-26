@@ -32,7 +32,7 @@ function exec(cmd) {
   return output
 }
 
-var supportCollectionExclude = !/v2/.test(exec('mongo --version'))
+var supportCollectionExclude = !/version: 2/.test(exec('mongo --version'))
 
 var excludeCollections = [
   'userActivity',
