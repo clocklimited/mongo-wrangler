@@ -5,7 +5,7 @@ var argv = require('./minimist')(process.argv.slice(2), { boolean: ['v'] })
 var color = require('./color')
 var databaseName = argv._[0]
 var verbose = !!argv.v
-var customExcludes = argv.e || []
+var customExcludes = (argv.e && argv.e.split(',')) || []
 
 function printUsage () {
   console.log('')
@@ -49,19 +49,20 @@ var tarFilename = newDatabaseName + '.tar.bz'
 var likelyRestoreName = databaseName.replace(/(staging|production)$/, 'development')
 console.log(color('\n💩\tDumping', 'grey'), color(databaseName, 'yellow'))
 console.log(color('\n❌\tExcluding collections', 'grey'), color(excludeCollections.join(', '), 'green'))
+
 if (supportCollectionExclude) {
   exec('mongodump ' + (!verbose ?'--quiet' : '') + ' --db ' + databaseName + ' ' + excludeCollections.map(function (collection) { return '--excludeCollection ' + collection }).join(' '))
 } else {
-  exec('mongodump ' + (!verbose ?'--quiet' : '') + ' --db ' + databaseName)
-}
-console.log(color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow'),)
-exec('mongorestore ' + (!verbose ?'--quiet' : '') + ' -d ' + newDatabaseName + ' dump/' + databaseName)
-
-if (!supportCollectionExclude) {
-  excludeCollections.forEach(function (collection) {
-    exec('echo "db.getCollection(\'' + collection + '\').drop()" || mongo ' + newDatabaseName)
+  var collections = JSON.parse(exec('echo "db.getCollectionNames()" | mongo --quiet ' + databaseName).toString())
+  var includeCollections = []
+  collections.forEach(function (collection) {
+    if (excludeCollections.indexOf(collection) !== -1) return false
+    exec('mongodump -c ' + collection + ' ' + (!verbose ?'--quiet' : '') + ' --db ' + databaseName)
   })
 }
+
+console.log(color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow'),)
+exec('mongorestore ' + (!verbose ?'--quiet' : '') + ' -d ' + newDatabaseName + ' dump/' + databaseName)
 
 console.log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
 exec('mongo ' + newDatabaseName + ' ' + './obfuscate.js')
@@ -76,7 +77,7 @@ var url = exec('curl --silent -H "Max-Days: 1" -H "Max-Downloads: 10" --upload-f
 exec('rm -rf ' + tarFilename)
 exec('echo "db.dropDatabase()" | mongo ' + newDatabaseName)
 
-console.log(color('\n✅\How to restore the 💩\n', 'white'))
+console.log(color('\n✅\tHow to restore the 💩\n', 'white'))
 console.log(color('If you have cloned https://github.com/clocklimited/mongo-wrangler.git` then use this\n', 'yellow'))
 console.log(color('\t./restore.js ' + likelyRestoreName + ' ' + url + '\n', 'white'))
 console.log(color('Too lazy for git cloning? Use this:\n', 'yellow'))
