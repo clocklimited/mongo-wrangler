@@ -1,16 +1,36 @@
 #!/usr/bin/env node
 var execSync = require('child_process').execSync
 
-function exec(cmd) {
-  var output = execSync(cmd).toString()
-  if (process.env.DEBUG) {
-    console.log(cmd)
-    console.log(output)
-  }
+var argv = require('./minimist')(process.argv.slice(2), { boolean: ['v', 'n'] })
+var color = require('./color')
+var databaseName = argv._[0]
+var tarUrl = process.env.URL || argv._[1]
+var verbose = !!argv.v
+var noIndex = !!argv.n
+
+function printUsage () {
+  console.log('')
+  console.log('Usage:')
+  console.log('\t' + path.basename(process.argv[1]) + ' [options] database url')
+  console.log('Options:')
+  console.log('\t-v - verbose')
+  console.log('\n')
 }
 
-var databaseName = process.env.DATABASE_NAME || process.argv[2]
-var tarUrl = process.env.URL || process.argv[3]
+if (!databaseName) {
+  console.error(color('Missing database name', 'red'))
+  printUsage()
+  process.exit(1)
+}
+
+function exec(cmd) {
+  const output = execSync(cmd).toString()
+  if (verbose) {
+    console.log('$ ' + color(cmd, 'dark grey'))
+    console.log(output)
+  }
+  return output
+}
 
 var parse = require('url').parse
 var basename = require('path').basename
@@ -19,10 +39,10 @@ var dumpName = tarName.replace(/\.tar\.bz$/g, '')
 
 var rnd = Math.random().toString(36).substr(2)
 var tmpPath = '/tmp/' + rnd + '/'
-console.log('Getting Database', databaseName, tarUrl, tarName)
+console.log('Restoring Database', color(databaseName, 'yellow'), 'from', color(tarUrl, 'green'))
 exec('mkdir -p /tmp/' + rnd)
 exec('curl --silent ' + tarUrl + ' -o ' + tmpPath + tarName)
 exec('tar jxvf ' + tmpPath + tarName + ' -C ' + tmpPath)
 
-exec('mongorestore --quiet --drop -d ' + databaseName + ' ' + tmpPath + 'dump/' + dumpName)
+exec('mongorestore ' + (!verbose ?'--quiet' : '') + ' ' + (noIndex ?'--noIndexRestore' : '') + ' --drop -d ' + databaseName + ' ' + tmpPath + 'dump/' + dumpName)
 exec('rm -rf /tmp/' + rnd)
