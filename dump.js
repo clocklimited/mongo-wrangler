@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 var path = require('path')
 var execSync = require('child_process').execSync
-var argv = require('./minimist')(process.argv.slice(2), { boolean: ['v'] })
-var color = require('./color')
+var argv = require('./src/minimist')(process.argv.slice(2), { boolean: ['v'] })
+var color = require('./src/color')
 var databaseName = argv._[0]
 var verbose = !!argv.v
 var customExcludes = (argv.e && argv.e.split(',')) || []
@@ -73,7 +73,7 @@ console.log(color('🗜\tCompressing ' + tarFilename, 'grey'))
 exec('tar jcf ' + tarFilename + ' dump')
 exec('rm -rf dump')
 console.log(color('⬆️\tUploading to xfer', 'grey'))
-var url = exec('curl --silent -H "Max-Days: 1" -H "Max-Downloads: 10" --upload-file ./' + tarFilename + ' https://xfer.clock.co.uk/' + tarFilename).toString()
+var url = exec('curl --silent -H "Max-Days: 1" -H "Max-Downloads: 50" --upload-file ./' + tarFilename + ' https://xfer.clock.co.uk/' + tarFilename).toString()
 exec('rm -rf ' + tarFilename)
 exec('echo "db.dropDatabase()" | mongo ' + newDatabaseName)
 
