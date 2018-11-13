@@ -3,10 +3,13 @@ var execSync = require('child_process').execSync
 var argv = require('./minimist')(process.argv.slice(2), { boolean: ['v', 'n'] })
 var color = require('./color')
 var path = require('path')
-var databaseName = argv._[0]
+var databaseName = argv._[0] || process.env.DATABASE_NAME
 var tarUrl = process.env.URL || argv._[1]
 var verbose = !!argv.v
 var noIndex = !!argv.n
+
+var rnd = Math.random().toString(36).substr(2)
+var tmpPath = '/tmp/' + rnd + '/'
 
 function printUsage () {
   console.log('')
@@ -44,8 +47,7 @@ var basename = require('path').basename
 var tarName = basename(parse(tarUrl).path)
 var dumpName = tarName.replace(/\.tar\.bz$/g, '')
 
-var rnd = Math.random().toString(36).substr(2)
-var tmpPath = '/tmp/' + rnd + '/'
+
 console.log('Restoring Database', color(databaseName, 'yellow'), 'from', color(tarUrl, 'green'))
 exec('mkdir -p /tmp/' + rnd)
 exec('curl --silent ' + tarUrl + ' -o ' + tmpPath + tarName)
