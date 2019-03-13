@@ -61,13 +61,13 @@ if (supportCollectionExclude) {
   })
 }
 
-console.log(color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow'),)
+console.log(color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow'))
 exec('mongorestore ' + (!verbose ?'--quiet' : '') + ' -d ' + newDatabaseName + ' dump/' + databaseName)
 
 console.log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
 exec('mongo ' + newDatabaseName + ' ' + './obfuscate.js')
 exec('rm -rf dump')
-console.log(color('💩\tDumping ' + newDatabaseName, 'grey'),)
+console.log(color('💩\tDumping ' + newDatabaseName, 'grey'))
 exec('mongodump ' + (!verbose ?'--quiet' : '') + ' --db ' + newDatabaseName)
 console.log(color('🗜\tCompressing ' + tarFilename, 'grey'))
 exec('tar jcf ' + tarFilename + ' dump')
