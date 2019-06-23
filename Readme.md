@@ -1,5 +1,7 @@
 # Mongo Wrangler
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/clocklimited/mongo-wrangler.svg)](https://greenkeeper.io/)
+
 Lightweight copies of databases with personal data obfuscated.
 
 **Two developers one dump 💩**
