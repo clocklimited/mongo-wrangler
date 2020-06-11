@@ -49,7 +49,7 @@ var tarFilename = newDatabaseName + '.tar.bz'
 var likelyRestoreName = databaseName.replace(/(staging|production)$/, 'development')
 console.log(color('\n💩\tDumping', 'grey'), color(databaseName, 'yellow'))
 console.log(color('\n❌\tExcluding collections', 'grey'), color(excludeCollections.join(', '), 'green'))
-exec('rm -rf dump')
+exec('rm -rf dump indexes')
 if (supportCollectionExclude) {
   exec('mongodump ' + (!verbose ?'--quiet' : '') + ' --db ' + databaseName + ' ' + excludeCollections.map(function (collection) { return '--excludeCollection ' + collection }).join(' '))
 } else {
@@ -61,8 +61,11 @@ if (supportCollectionExclude) {
   })
 }
 
+console.log(color('\n💩\tDumping indexes', 'grey'), color(databaseName, 'yellow'))
+exec('mongo ' + databaseName + ' index-getter.js | tail -n+4 > indexes')
+
 console.log(color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow'),)
-exec('mongorestore ' + (!verbose ?'--quiet' : '') + ' -d ' + newDatabaseName + ' dump/' + databaseName)
+exec('mongorestore --noIndexRestore ' + (!verbose ?'--quiet' : '') + ' -d ' + newDatabaseName + ' dump/' + databaseName)
 
 console.log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
 exec('mongo ' + newDatabaseName + ' ' + './obfuscate.js')
@@ -70,8 +73,8 @@ exec('rm -rf dump')
 console.log(color('💩\tDumping ' + newDatabaseName, 'grey'),)
 exec('mongodump ' + (!verbose ?'--quiet' : '') + ' --db ' + newDatabaseName)
 console.log(color('🗜\tCompressing ' + tarFilename, 'grey'))
-exec('tar jcf ' + tarFilename + ' dump')
-exec('rm -rf dump')
+exec('tar jcf ' + tarFilename + ' dump indexes')
+exec('rm -rf dump indexes')
 console.log(color('⬆️\tUploading to xfer', 'grey'))
 var url = exec('curl --silent -H "Max-Days: 1" -H "Max-Downloads: 50" --upload-file ./' + tarFilename + ' https://xfer.clock.co.uk/' + tarFilename).toString()
 exec('rm -rf ' + tarFilename)
