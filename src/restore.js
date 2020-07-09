@@ -1,4 +1,5 @@
 var execSync = require('child_process').execSync
+var exists = require('fs').existsSync
 
 var argv = require('./minimist')(process.argv.slice(2), { boolean: ['v', 'n'] })
 var color = require('./color')
@@ -49,9 +50,12 @@ var dumpName = tarName.replace(/\.tar\.bz$/g, '')
 
 
 console.log('Restoring Database', color(databaseName, 'yellow'), 'from', color(tarUrl, 'green'))
-exec('mkdir -p /tmp/' + rnd)
+exec('mkdir -p ' + tmpPath)
 exec('curl --silent ' + tarUrl + ' -o ' + tmpPath + tarName)
 exec('tar jxvf ' + tmpPath + tarName + ' -C ' + tmpPath)
 
 exec('mongorestore ' + (!verbose ?'--quiet' : '') + ' ' + (noIndex ?'--noIndexRestore' : '') + ' --drop -d ' + databaseName + ' ' + tmpPath + 'dump/' + dumpName)
-exec('rm -rf /tmp/' + rnd)
+if (!noIndex && exists(tmpPath + 'indexes')) {
+  console.log('Restoring Indexes')
+  exec('mongo ' + databaseName + ' ' + tmpPath + 'indexes')
+}
