@@ -62,7 +62,7 @@ if (supportCollectionExclude) {
 }
 
 console.log(color('\n💩\tDumping indexes', 'grey'), color(databaseName, 'yellow'))
-exec('mongo --quiet' + databaseName + ' index-getter.js > indexes')
+exec('mongo --quiet ' + databaseName + ' index-getter.js > indexes')
 
 console.log(color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow'),)
 exec('mongorestore --noIndexRestore ' + (!verbose ?'--quiet' : '') + ' -d ' + newDatabaseName + ' dump/' + databaseName)
