@@ -6,6 +6,6 @@ db.getCollectionNames().forEach(function (collection) {
     delete index.key
     delete index.v
     delete index.ns
-    print(`db['${collection}'].createIndex(${keys}, ${tojsononeline(index)});`)
+    print("db['" + collection + "'].createIndex(" + keys + ", " + tojsononeline(index) + ");")
   })
 })
