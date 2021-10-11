@@ -28,6 +28,16 @@ To keep customer data safe and reduce the liability on developers, live database
 
 *Note: This is a clock.co.uk specific workflow!*
 
+## Dependencies
+
+This package requires `zstd` and `unzstd` binaries. You can get them from:
+
+Debian-based Linux (Ubuntu, etc):
+`apt install zstd`
+
+OSX:
+`brew install zstd`
+
 ## Dumping 💩
 
 **NB: With this tool it is possible to exhaust available disk space on the MongoDB server. For now, it is essential to manually check the size of the database you are going to dump, and the available disk space. Furthermore, if possible avoid running the tool close to the beginning of a new hour; Clock's servers are snapshotted every hour on the hour, and it is best to avoid storing the temporary dump files in those backups.**

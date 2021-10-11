@@ -45,7 +45,7 @@ var excludeCollections = [
 ].concat(customExcludes)
 var date = new Date().toISOString().substr(0, 19).replace(/[^\d]/g,'')
 var newDatabaseName = databaseName + '-' + date
-var tarFilename = newDatabaseName + '.tar.bz'
+var filename = newDatabaseName + '.tar.zst'
 var likelyRestoreName = databaseName.replace(/(staging|production)$/, 'development')
 console.log(color('\n💩\tDumping', 'grey'), color(databaseName, 'yellow'))
 console.log(color('\n❌\tExcluding collections', 'grey'), color(excludeCollections.join(', '), 'green'))
@@ -72,12 +72,9 @@ exec('mongo ' + newDatabaseName + ' ' + './obfuscate.js')
 exec('rm -rf dump')
 console.log(color('💩\tDumping ' + newDatabaseName, 'grey'),)
 exec('mongodump ' + (!verbose ?'--quiet' : '') + ' --db ' + newDatabaseName)
-console.log(color('🗜\tCompressing ' + tarFilename, 'grey'))
-exec('tar jcf ' + tarFilename + ' dump indexes')
+console.log(color('🗜\tCompressing and uploading to xfer', 'grey'))
+var url = exec('tar -cf - dump indexes | zstd --adapt | curl --silent -H "Max-Days: 1" -H "Max-Downloads: 50" --upload-file - https://xfer.clock.co.uk/' + filename).toString()
 exec('rm -rf dump indexes')
-console.log(color('⬆️\tUploading to xfer', 'grey'))
-var url = exec('curl --silent -H "Max-Days: 1" -H "Max-Downloads: 50" --upload-file ./' + tarFilename + ' https://xfer.clock.co.uk/' + tarFilename).toString()
-exec('rm -rf ' + tarFilename)
 exec('echo "db.dropDatabase()" | mongo ' + newDatabaseName)
 
 console.log(color('\n✅\tHow to restore the 💩\n', 'white'))
