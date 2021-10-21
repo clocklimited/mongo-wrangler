@@ -34,6 +34,24 @@ function obfuscate(value) {
     })
 }
 
+function updatePrivateKeyMap(document, currentMap) {
+  if (!currentMap) {
+    return {}
+  }
+  if (!document) {
+    return currentMap
+  }
+  var keys = Object.keys(document)
+  var keysNotInMap = keys.filter(
+    (key) => typeof currentMap[key] === 'undefined'
+  )
+  var updatedKeyMap = keysNotInMap.reduce(
+    (acc, key) => Object.assign(acc, { [key]: isPrivate(key) }),
+    currentMap
+  )
+  return updatedKeyMap
+}
+
 db.getCollectionNames().forEach(function (collectionName) {
   var collection = db.getCollection(collectionName)
   var count = collection.count({})
@@ -48,10 +66,16 @@ db.getCollectionNames().forEach(function (collectionName) {
   }
   if (count === 0) return false
   var counter = 0
+  var collectionPrivateKeyMap = {}
+
   collection.find({}).forEach(function (document) {
     var found = false
     var keys = Object.keys(document)
 
+    collectionPrivateKeyMap = updatePrivateKeyMap(
+      document,
+      collectionPrivateKeyMap
+    )
     keys.forEach(function (key) {
       if (typeof document[key] === 'string') {
         if (isClock(document[key])) {
