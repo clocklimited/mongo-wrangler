@@ -25,12 +25,10 @@ var upperChars = lowerChars.toUpperCase()
 function obfuscate(value) {
   return value
     .replace(/[a-z]/g, function () {
-      // return lowerChars[Math.floor(Math.random() * 26)]
-      return lowerChars[0]
+      return lowerChars[Math.floor(Math.random() * 26)]
     })
     .replace(/[A-Z]/g, function () {
-      // return upperChars[Math.floor(Math.random() * 26)]
-      return upperChars[1]
+      return upperChars[Math.floor(Math.random() * 26)]
     })
 }
 
