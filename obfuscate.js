@@ -86,7 +86,7 @@ db.getCollectionNames().forEach(function (collectionName) {
               ' from collection ' +
               collectionName
           )
-          return
+          break
         }
         if (collectionPrivateKeyMap[key]) {
           found = true
