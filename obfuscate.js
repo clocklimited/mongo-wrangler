@@ -5,19 +5,17 @@ var privateProperties = [
   /surname/,
   /addressLine/,
   /postcode/
-  ]
-
-var ignoreCollections = [
-  'player',
 ]
 
-function isPrivate (propertyName) {
+var ignoreCollections = ['player']
+
+function isPrivate(propertyName) {
   return privateProperties.some(function (privatePropertyName) {
     return privatePropertyName.test(propertyName)
   })
 }
 
-function isClock (document) {
+function isClock(value) {
   var value = false
   var found = Object.keys(document).some(function (key) {
     value = document[key]
@@ -29,12 +27,16 @@ function isClock (document) {
 var lowerChars = 'abcdefghijklmnopqrstuvwxyz'
 var upperChars = lowerChars.toUpperCase()
 
-function osfuscate (value) {
-  return value.replace(/[a-z]/g, function () {
-    return lowerChars[Math.floor(Math.random() * 26)]
-  }).replace(/[A-Z]/g, function () {
-    return upperChars[Math.floor(Math.random() * 26)]
-  })
+function obfuscate(value) {
+  return value
+    .replace(/[a-z]/g, function () {
+      // return lowerChars[Math.floor(Math.random() * 26)]
+      return lowerChars[0]
+    })
+    .replace(/[A-Z]/g, function () {
+      // return upperChars[Math.floor(Math.random() * 26)]
+      return upperChars[1]
+    })
 }
 
 db.getCollectionNames().forEach(function (collectionName) {
@@ -42,12 +44,12 @@ db.getCollectionNames().forEach(function (collectionName) {
   var count = collection.count({})
   print(count, '\t', collectionName)
   if (count > 15000) {
-    print('Very large collection. Considered excluding.')
+    print('Very large collection. Consider excluding.')
   }
   // Ignore some collections
   if (ignoreCollections.indexOf(collectionName) !== -1) {
-      print('Ignoring collection ' + collectionName)
-      return false
+    print('Ignoring collection ' + collectionName)
+    return false
   }
   if (count === 0) return false
   var counter = 0
@@ -55,7 +57,12 @@ db.getCollectionNames().forEach(function (collectionName) {
     var found = false
     var clockValue = isClock(document)
     if (clockValue) {
-      print('Skiping document containing ' + clockValue + ' from collection ' + collectionName)
+      print(
+        'Skipping document containing ' +
+          clockValue +
+          ' from collection ' +
+          collectionName
+      )
       return false
     }
     Object.keys(document).forEach(function (key) {
@@ -69,5 +76,5 @@ db.getCollectionNames().forEach(function (collectionName) {
       counter += 1
     }
   })
-  if (counter > 0)print('\tUpdated', counter)
+  if (counter > 0) print('\tUpdated', counter)
 })
