@@ -42,13 +42,13 @@ function updatePrivateKeyMap(document, currentMap) {
     return currentMap
   }
   var keys = Object.keys(document)
-  var keysNotInMap = keys.filter(
-    (key) => typeof currentMap[key] === 'undefined'
-  )
-  var updatedKeyMap = keysNotInMap.reduce(
-    (acc, key) => Object.assign(acc, { [key]: isPrivate(key) }),
-    currentMap
-  )
+  var keysNotInMap = keys.filter(function (key) {
+    return typeof currentMap[key] === 'undefined'
+  })
+  var updatedKeyMap = keysNotInMap.reduce(function (acc, key) {
+    acc[key] = isPrivate(key)
+    return acc
+  }, currentMap)
   return updatedKeyMap
 }
 
