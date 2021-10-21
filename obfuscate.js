@@ -71,12 +71,14 @@ db.getCollectionNames().forEach(function (collectionName) {
   collection.find({}).forEach(function (document) {
     var found = false
     var keys = Object.keys(document)
+    var totalKeys = keys.length
 
     collectionPrivateKeyMap = updatePrivateKeyMap(
       document,
       collectionPrivateKeyMap
     )
-    keys.forEach(function (key) {
+    for (var i = 0; i < totalKeys; i++) {
+      var key = keys[i]
       if (typeof document[key] === 'string') {
         if (isClock(document[key])) {
           found = false
@@ -93,7 +95,7 @@ db.getCollectionNames().forEach(function (collectionName) {
           document[key] = obfuscate(document[key])
         }
       }
-    })
+    }
     if (found) {
       collection.save(document)
       counter += 1
