@@ -85,7 +85,7 @@ You should be able to do to get a newer runtime:
 ### No `node` no `nave`
 
 ```
-wget http://github.com/isaacs/nave/raw/master/nave.sh
+wget http://github.com/isaacs/nave/raw/main/nave.sh
 bash ./nave.sh use stable
 ```
 
