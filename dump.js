@@ -41,7 +41,9 @@ var excludeCollections = [
   'formResponse',
   'latLongCache',
   'customerEventLog',
-  'order'
+  'order',
+  'uniqueCode',
+  'userData'
 ].concat(customExcludes)
 var date = new Date().toISOString().substr(0, 19).replace(/[^\d]/g,'')
 var newDatabaseName = databaseName + '-' + date
