@@ -8,8 +8,17 @@ var colors = {
   white: '\u001b[37;1m'
 }
 
+function nocolor(message) {
+  return message
+}
+
 function color(message, colorName) {
   var colorToUse = colors[colorName] || colors.reset
   return colorToUse + message + colors.reset
 }
-module.exports = color
+
+function createColor(bland) {
+  return bland ? nocolor : color
+}
+
+module.exports = createColor

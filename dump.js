@@ -1,24 +1,28 @@
 #!/usr/bin/env node
 var path = require('path')
 var execSync = require('child_process').execSync
-var argv = require('./src/minimist')(process.argv.slice(2), { boolean: ['v'] })
-var color = require('./src/color')
+var argv = require('./src/minimist')(process.argv.slice(2), {
+  boolean: ['v', 'bland']
+})
+var log = require('./src/log')(argv.bland)
+var color = require('./src/color')(argv.bland)
 var databaseName = argv._[0]
 var verbose = !!argv.v
 var customExcludes = (argv.e && argv.e.split(',')) || []
 var customIncludes = (argv.i && argv.i.split(',')) || []
 
 function printUsage() {
-  console.log('')
-  console.log('Usage:')
-  console.log('\t' + path.basename(process.argv[1]) + ' [options] database')
-  console.log('Options:')
-  console.log('\t-v - verbose')
-  console.log('\t-e - comma separated list of collections to exclude')
-  console.log(
+  log('')
+  log('Usage:')
+  log('\t' + path.basename(process.argv[1]) + ' [options] database')
+  log('Options:')
+  log('\t-v - verbose')
+  log('\t--bland - removes emoji and colour from output')
+  log('\t-e - comma separated list of collections to exclude')
+  log(
     '\t-i - comma separated list of collections to include, overrides default excludes'
   )
-  console.log('\n')
+  log('\n')
 }
 
 if (!databaseName) {
@@ -30,8 +34,8 @@ if (!databaseName) {
 function exec(cmd) {
   const output = execSync(cmd).toString()
   if (verbose) {
-    console.log('$ ' + color(cmd, 'dark grey'))
-    console.log(output)
+    log('$ ' + color(cmd, 'dark grey'))
+    log(output)
   }
   return output
 }
@@ -58,8 +62,8 @@ var likelyRestoreName = databaseName.replace(
   /(staging|production)$/,
   'development'
 )
-console.log(color('\n💩\tDumping', 'grey'), color(databaseName, 'yellow'))
-console.log(
+log(color('\n💩\tDumping', 'grey'), color(databaseName, 'yellow'))
+log(
   color('\n❌\tExcluding collections', 'grey'),
   color(excludeCollections.join(', '), 'green')
 )
@@ -97,13 +101,10 @@ if (supportCollectionExclude) {
   })
 }
 
-console.log(
-  color('\n💩\tDumping indexes', 'grey'),
-  color(databaseName, 'yellow')
-)
+log(color('\n💩\tDumping indexes', 'grey'), color(databaseName, 'yellow'))
 exec('mongo --quiet ' + databaseName + ' index-getter.js > indexes')
 
-console.log(
+log(
   color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow')
 )
 exec(
@@ -115,31 +116,29 @@ exec(
     databaseName
 )
 
-console.log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
+log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
 exec('mongo ' + newDatabaseName + ' ' + './obfuscate.js')
 exec('rm -rf dump')
-console.log(color('💩\tDumping ' + newDatabaseName, 'grey'))
+log(color('💩\tDumping ' + newDatabaseName, 'grey'))
 exec('mongodump ' + (!verbose ? '--quiet' : '') + ' --db ' + newDatabaseName)
-console.log(color('🗜\tCompressing and uploading to xfer', 'grey'))
+log(color('🗜\tCompressing and uploading to xfer', 'grey'))
 var url = exec(
-  'tar -cf - dump indexes | zstd --adapt | curl --silent -H "Max-Days: 1" -H "Max-Downloads: 50" --upload-file - https://xfer.clock.co.uk/' +
+  'tar -cf - dump indexes | zstd | curl --silent -H "Max-Days: 1" -H "Max-Downloads: 50" --upload-file - https://xfer.clock.co.uk/' +
     filename
 ).toString()
 exec('rm -rf dump indexes')
 exec('echo "db.dropDatabase()" | mongo ' + newDatabaseName)
 
-console.log(color('\n✅\tHow to restore the 💩\n', 'white'))
-console.log(
+log(color('\n✅\tHow to restore the 💩\n', 'white'))
+log(
   color(
     'If you have cloned https://github.com/clocklimited/mongo-wrangler.git` then use this\n',
     'yellow'
   )
 )
-console.log(
-  color('\t./restore.js ' + likelyRestoreName + ' ' + url + '\n', 'white')
-)
-console.log(color('Too lazy for git cloning? Use this:\n', 'yellow'))
-console.log(
+log(color('\t./restore.js ' + likelyRestoreName + ' ' + url + '\n', 'white'))
+log(color('Too lazy for git cloning? Use this:\n', 'yellow'))
+log(
   color(
     '\tcurl --silent https://raw.githubusercontent.com/clocklimited/mongo-wrangler/master/restore.js | tail -n+2 | DATABASE_NAME=' +
       likelyRestoreName +
