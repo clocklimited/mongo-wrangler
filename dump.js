@@ -138,15 +138,15 @@ log(
     'yellow'
   )
 )
-log(color('\t./restore.js ' + likelyRestoreName + ' ' + url + '\n', 'white'))
+log(color('\t./src/restore.js ' + likelyRestoreName + ' ' + url + '\n', 'white'))
 log(color('Too lazy for git cloning? Use this:\n', 'yellow'))
 log(
   color(
-    '\tcurl --silent https://raw.githubusercontent.com/clocklimited/mongo-wrangler/master/restore.js | tail -n+2 | DATABASE_NAME=' +
+    '\tcurl --silent https://raw.githubusercontent.com/clocklimited/mongo-wrangler/feature/improvements/restore.sh | DATABASE_NAME=' +
       likelyRestoreName +
       ' URL=' +
       url +
-      ' node\n',
+      ' bash\n',
     'white'
   )
 )
