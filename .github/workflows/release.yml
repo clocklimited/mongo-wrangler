@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    branches: [ feature/improvements ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Install dependencies
+      run: yarn install
+
+    - name: Build binaries
+      run: yarn build
+
+    - name: Release Linux
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "linux-latest"
+        prerelease: false
+        draft: false
+        files: |
+          LICENSE
+          dist/*-linux
+
+    - name: Release MacOS
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "macos-latest"
+        prerelease: false
+        draft: false
+        files: |
+          LICENSE
+          dist/*-macos
