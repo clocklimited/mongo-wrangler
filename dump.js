@@ -150,3 +150,15 @@ log(
     'white'
   )
 )
+
+log(color('Restoring to a docker container? Use this:\n', 'yellow'))
+log(
+  color(
+    '\tcurl --silent https://raw.githubusercontent.com/clocklimited/mongo-wrangler/feature/improvements/restore.sh | IS_DOCKER=1 DATABASE_NAME=' +
+      likelyRestoreName +
+      ' URL=' +
+      url +
+      ' bash\n',
+    'white'
+  )
+)
