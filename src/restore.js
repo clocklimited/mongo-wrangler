@@ -1,8 +1,9 @@
 var execSync = require('child_process').execSync
 var exists = require('fs').existsSync
 
-var argv = require('./minimist')(process.argv.slice(2), { boolean: ['v', 'n'] })
-var color = require('./color')
+var argv = require('./minimist')(process.argv.slice(2), { boolean: ['v', 'n', 'bland'] })
+var log = require('./log')(argv.bland)
+var color = require('./color')(argv.bland)
 var path = require('path')
 var databaseName = argv._[0] || process.env.DATABASE_NAME
 var tarUrl = process.env.URL || argv._[1]
@@ -13,13 +14,13 @@ var rnd = Math.random().toString(36).substr(2)
 var tmpPath = '/tmp/' + rnd + '/'
 
 function printUsage() {
-  console.log('')
-  console.log('Usage:')
-  console.log('\t' + path.basename(process.argv[1]) + ' [options] database url')
-  console.log('Options:')
-  console.log('\t-v - verbose')
-  console.log('\t-n - no indexes')
-  console.log('\n')
+  log('')
+  log('Usage:')
+  log('\t' + path.basename(process.argv[1]) + ' [options] database url')
+  log('Options:')
+  log('\t-v - verbose')
+  log('\t-n - no indexes')
+  log('\n')
 }
 
 if (!databaseName) {
@@ -30,7 +31,7 @@ if (!databaseName) {
 
 function exec(cmd) {
   let output
-  if (verbose) console.log('$ ' + color(cmd, 'dark grey'))
+  if (verbose) log('$ ' + color(cmd, 'dark grey'))
   try {
     output = execSync(cmd).toString()
   } catch (e) {
@@ -39,7 +40,7 @@ function exec(cmd) {
     )
     process.exit(1)
   }
-  if (verbose) console.log(output)
+  if (verbose) log(output)
   return output
 }
 
@@ -48,7 +49,7 @@ var basename = require('path').basename
 var tarName = basename(parse(tarUrl).path)
 var dumpName = tarName.replace(/\.tar\.zst$/g, '')
 
-console.log(
+log(
   'Restoring Database',
   color(databaseName, 'yellow'),
   'from',
@@ -69,8 +70,8 @@ exec(
     dumpName
 )
 if (!noIndex && exists(tmpPath + 'indexes')) {
-  console.log('Restoring Indexes')
+  log('Restoring Indexes')
   exec('mongo ' + databaseName + ' ' + tmpPath + 'indexes')
 }
-console.log('Clearing up')
+log('Clearing up')
 exec('rm -rf ' + tmpPath)
