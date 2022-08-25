@@ -29,6 +29,12 @@ if (!databaseName) {
   process.exit(1)
 }
 
+if (!tarUrl) {
+  console.error(color('Missing database URL', 'red'))
+  printUsage()
+  process.exit(1)
+}
+
 function exec(cmd) {
   let output
   if (verbose) log('$ ' + color(cmd, 'dark grey'))
