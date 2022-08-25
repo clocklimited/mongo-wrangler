@@ -7,8 +7,8 @@ var color = require('./color')(argv.bland)
 var path = require('path')
 var databaseName = argv._[0] || process.env.DATABASE_NAME
 var tarUrl = process.env.URL || argv._[1]
-var verbose = !!argv.v
-var noIndex = !!argv.n
+var verbose = !!process.env.VERBOSE ||!!argv.v
+var noIndex = !!process.env.NO_INDEX || !!argv.n
 
 var rnd = Math.random().toString(36).substr(2)
 var tmpPath = '/tmp/' + rnd + '/'
@@ -36,7 +36,7 @@ function exec(cmd) {
     output = execSync(cmd).toString()
   } catch (e) {
     console.error(
-      'There was an error. Use `-v` to see the failed output. Often -n to ignore indexes, fixes the issue.'
+      'There was an error. Use `-v` / `VERBOSE` to see the failed output. Often `-n` / `NO_INDEX` to ignore indexes, fixes the issue.'
     )
     process.exit(1)
   }
