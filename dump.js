@@ -86,7 +86,7 @@ if (supportCollectionExclude) {
 } else {
   var collections = JSON.parse(
     exec(
-      'echo "db.getCollectionNames()" | mongo --quiet ' + databaseName
+      'echo "db.getCollectionNames()" | mongo --norc --quiet ' + databaseName
     ).toString()
   )
   var includeCollections = []
@@ -104,7 +104,7 @@ if (supportCollectionExclude) {
 }
 
 log(color('\n💩\tDumping indexes', 'grey'), color(databaseName, 'yellow'))
-exec('mongo --quiet ' + databaseName + ' index-getter.js > indexes')
+exec('mongo --norc --quiet ' + databaseName + ' index-getter.js > indexes')
 
 log(
   color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow')
@@ -119,7 +119,7 @@ exec(
 )
 
 log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
-exec('mongo ' + newDatabaseName + ' ' + './obfuscate.js')
+exec('mongo --norc ' + newDatabaseName + ' ' + './obfuscate.js')
 exec('rm -rf dump')
 log(color('💩\tDumping ' + newDatabaseName, 'grey'))
 exec('mongodump ' + (!verbose ? '--quiet' : '') + ' --db ' + newDatabaseName)
@@ -129,7 +129,7 @@ var url = exec(
     filename
 ).toString()
 exec('rm -rf dump indexes')
-exec('echo "db.dropDatabase()" | mongo ' + newDatabaseName)
+exec('echo "db.dropDatabase()" | mongo --norc ' + newDatabaseName)
 
 log(color('\n✅\tHow to restore the 💩\n', 'white'))
 log(
