@@ -1,9 +1,9 @@
 {
   "devDependencies": {
-    "webpack": "^4.25.1",
-    "webpack-cli": "^3.1.2"
+    "pkg": "^5.8.0"
   },
   "scripts": {
-    "build": "webpack"
+    "build": "yarn build-file restore.js && yarn build-file dump.js",
+    "build-file": "pkg --target latest-linux,latest-macos --out-path dist --compress GZip"
   }
 }
