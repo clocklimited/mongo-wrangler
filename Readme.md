@@ -74,6 +74,12 @@ If you find other big collections that are slowing up your dumps or taking a lot
 
 Properties containing [these properties](obfuscate.js#L1) are obfuscated by default. This can cause some data you don't want getting obfuscated. You'll have to ask the privileged to do a customer dump or submit a PR if this causes a problem.
 
+## Cross-platform
+
+The latest version of mongo-wrangler supports two executables for Node-free dumping and restoration.
+
+Linux and MacOS binaries are available in `dist/`. You simply need to clone the repo and use these as you would through Node. Some options are supported via environment variables.
+
 ## Troubleshooting
 
 ### You need to be on node 0.11+
