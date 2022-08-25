@@ -28,39 +28,5 @@ yarn-error.log
 # Istanbul Coverage
 coverage
 
-# Project Specific
-site/static-file-map.json
-site/assets/css
-site/assets/img/sprite/generated/*
-site/assets/js/build
-site/source/config.json
-site/source/stylus/sprite/sprite.styl
-
-admin/static-file-map.json
-admin/assets/css
-admin/assets/js/build
-admin/source/config.json
-admin/source/js/components.js
-
 .eslintcache
-support/sotic-import/images/*
-!support/sotic-import/images/.keep
-support/sotic-import/data
-
-mobile-app/www/js
-dist
-mobile-app/plugins
-mobile-app/platforms
-components/browser/whitelist-config.json
-
 yarn-error.log
-mobile-app/build
-
-mobile-app/build
-
-mobile-app/mobile-app/platforms
-mobile-app/mobile-app/plugins
-
-mobile-app/mobile-app/www/asset-manifest.json
-mobile-app/mobile-app/www/*
-mobile-app/*.tar
