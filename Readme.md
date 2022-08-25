@@ -26,7 +26,7 @@ To keep customer data safe and reduce the liability on developers, live database
 
 **Privileged user:** 💬 You are most welcome. 😄 Have a great day! 🎈
 
-*Note: This is a clock.co.uk specific workflow!*
+_Note: This is a clock.co.uk specific workflow!_
 
 ## Dependencies
 
@@ -46,7 +46,7 @@ OSX:
 
 2. If this is your first dump 💩
 
-    `git clone https://github.com/clocklimited/mongo-wrangler.git`
+   `git clone https://github.com/clocklimited/mongo-wrangler.git`
 
 3. `cd mongo-wrangler`
 
@@ -97,7 +97,7 @@ Add `-v` on either command to see the commands run and get verbose output
 
 Use `-n` to ignore indexes on restore
 
-`	./restore.js -n {DB} {URL}`
+` ./restore.js -n {DB} {URL}`
 
 ### Xfer
 

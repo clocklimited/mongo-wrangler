@@ -12,7 +12,7 @@ var noIndex = !!argv.n
 var rnd = Math.random().toString(36).substr(2)
 var tmpPath = '/tmp/' + rnd + '/'
 
-function printUsage () {
+function printUsage() {
   console.log('')
   console.log('Usage:')
   console.log('\t' + path.basename(process.argv[1]) + ' [options] database url')
@@ -34,7 +34,9 @@ function exec(cmd) {
   try {
     output = execSync(cmd).toString()
   } catch (e) {
-    console.error('There was an error. Use `-v` to see the failed output. Often -n to ignore indexes, fixes the issue.')
+    console.error(
+      'There was an error. Use `-v` to see the failed output. Often -n to ignore indexes, fixes the issue.'
+    )
     process.exit(1)
   }
   if (verbose) console.log(output)
@@ -46,12 +48,26 @@ var basename = require('path').basename
 var tarName = basename(parse(tarUrl).path)
 var dumpName = tarName.replace(/\.tar\.zst$/g, '')
 
-
-console.log('Restoring Database', color(databaseName, 'yellow'), 'from', color(tarUrl, 'green'))
+console.log(
+  'Restoring Database',
+  color(databaseName, 'yellow'),
+  'from',
+  color(tarUrl, 'green')
+)
 exec('mkdir -p ' + tmpPath)
 exec('curl --silent ' + tarUrl + ' | unzstd | tar -xf - -C ' + tmpPath)
 
-exec('mongorestore ' + (!verbose ?'--quiet ' : '') + (noIndex ?'--noIndexRestore' : '') + ' --drop -d ' + databaseName + ' ' + tmpPath + 'dump/' + dumpName)
+exec(
+  'mongorestore ' +
+    (!verbose ? '--quiet ' : '') +
+    (noIndex ? '--noIndexRestore' : '') +
+    ' --drop -d ' +
+    databaseName +
+    ' ' +
+    tmpPath +
+    'dump/' +
+    dumpName
+)
 if (!noIndex && exists(tmpPath + 'indexes')) {
   console.log('Restoring Indexes')
   exec('mongo ' + databaseName + ' ' + tmpPath + 'indexes')

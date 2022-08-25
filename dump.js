@@ -7,7 +7,7 @@ var databaseName = argv._[0]
 var verbose = !!argv.v
 var customExcludes = (argv.e && argv.e.split(',')) || []
 
-function printUsage () {
+function printUsage() {
   console.log('')
   console.log('Usage:')
   console.log('\t' + path.basename(process.argv[1]) + ' [options] database')
@@ -45,42 +45,101 @@ var excludeCollections = [
   'uniqueCode',
   'userData'
 ].concat(customExcludes)
-var date = new Date().toISOString().substr(0, 19).replace(/[^\d]/g,'')
+var date = new Date().toISOString().substr(0, 19).replace(/[^\d]/g, '')
 var newDatabaseName = databaseName + '-' + date
 var filename = newDatabaseName + '.tar.zst'
-var likelyRestoreName = databaseName.replace(/(staging|production)$/, 'development')
+var likelyRestoreName = databaseName.replace(
+  /(staging|production)$/,
+  'development'
+)
 console.log(color('\n💩\tDumping', 'grey'), color(databaseName, 'yellow'))
-console.log(color('\n❌\tExcluding collections', 'grey'), color(excludeCollections.join(', '), 'green'))
+console.log(
+  color('\n❌\tExcluding collections', 'grey'),
+  color(excludeCollections.join(', '), 'green')
+)
 exec('rm -rf dump indexes')
 if (supportCollectionExclude) {
-  exec('mongodump ' + (!verbose ?'--quiet' : '') + ' --db ' + databaseName + ' ' + excludeCollections.map(function (collection) { return '--excludeCollection ' + collection }).join(' '))
+  exec(
+    'mongodump ' +
+      (!verbose ? '--quiet' : '') +
+      ' --db ' +
+      databaseName +
+      ' ' +
+      excludeCollections
+        .map(function (collection) {
+          return '--excludeCollection ' + collection
+        })
+        .join(' ')
+  )
 } else {
-  var collections = JSON.parse(exec('echo "db.getCollectionNames()" | mongo --quiet ' + databaseName).toString())
+  var collections = JSON.parse(
+    exec(
+      'echo "db.getCollectionNames()" | mongo --quiet ' + databaseName
+    ).toString()
+  )
   var includeCollections = []
   collections.forEach(function (collection) {
     if (excludeCollections.indexOf(collection) !== -1) return false
-    exec('mongodump -c ' + collection + ' ' + (!verbose ?'--quiet' : '') + ' --db ' + databaseName)
+    exec(
+      'mongodump -c ' +
+        collection +
+        ' ' +
+        (!verbose ? '--quiet' : '') +
+        ' --db ' +
+        databaseName
+    )
   })
 }
 
-console.log(color('\n💩\tDumping indexes', 'grey'), color(databaseName, 'yellow'))
+console.log(
+  color('\n💩\tDumping indexes', 'grey'),
+  color(databaseName, 'yellow')
+)
 exec('mongo --quiet ' + databaseName + ' index-getter.js > indexes')
 
-console.log(color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow'),)
-exec('mongorestore --noIndexRestore ' + (!verbose ?'--quiet' : '') + ' -d ' + newDatabaseName + ' dump/' + databaseName)
+console.log(
+  color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow')
+)
+exec(
+  'mongorestore --noIndexRestore ' +
+    (!verbose ? '--quiet' : '') +
+    ' -d ' +
+    newDatabaseName +
+    ' dump/' +
+    databaseName
+)
 
 console.log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
 exec('mongo ' + newDatabaseName + ' ' + './obfuscate.js')
 exec('rm -rf dump')
-console.log(color('💩\tDumping ' + newDatabaseName, 'grey'),)
-exec('mongodump ' + (!verbose ?'--quiet' : '') + ' --db ' + newDatabaseName)
+console.log(color('💩\tDumping ' + newDatabaseName, 'grey'))
+exec('mongodump ' + (!verbose ? '--quiet' : '') + ' --db ' + newDatabaseName)
 console.log(color('🗜\tCompressing and uploading to xfer', 'grey'))
-var url = exec('tar -cf - dump indexes | zstd --adapt | curl --silent -H "Max-Days: 1" -H "Max-Downloads: 50" --upload-file - https://xfer.clock.co.uk/' + filename).toString()
+var url = exec(
+  'tar -cf - dump indexes | zstd --adapt | curl --silent -H "Max-Days: 1" -H "Max-Downloads: 50" --upload-file - https://xfer.clock.co.uk/' +
+    filename
+).toString()
 exec('rm -rf dump indexes')
 exec('echo "db.dropDatabase()" | mongo ' + newDatabaseName)
 
 console.log(color('\n✅\tHow to restore the 💩\n', 'white'))
-console.log(color('If you have cloned https://github.com/clocklimited/mongo-wrangler.git` then use this\n', 'yellow'))
-console.log(color('\t./restore.js ' + likelyRestoreName + ' ' + url + '\n', 'white'))
+console.log(
+  color(
+    'If you have cloned https://github.com/clocklimited/mongo-wrangler.git` then use this\n',
+    'yellow'
+  )
+)
+console.log(
+  color('\t./restore.js ' + likelyRestoreName + ' ' + url + '\n', 'white')
+)
 console.log(color('Too lazy for git cloning? Use this:\n', 'yellow'))
-console.log(color('\tcurl --silent https://raw.githubusercontent.com/clocklimited/mongo-wrangler/master/restore.js | tail -n+2 | DATABASE_NAME=' + likelyRestoreName + ' URL=' + url + ' node\n', 'white'))
+console.log(
+  color(
+    '\tcurl --silent https://raw.githubusercontent.com/clocklimited/mongo-wrangler/master/restore.js | tail -n+2 | DATABASE_NAME=' +
+      likelyRestoreName +
+      ' URL=' +
+      url +
+      ' node\n',
+    'white'
+  )
+)

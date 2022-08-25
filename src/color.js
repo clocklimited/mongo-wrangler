@@ -8,7 +8,7 @@ var colors = {
   white: '\u001b[37;1m'
 }
 
-function color (message, colorName) {
+function color(message, colorName) {
   var colorToUse = colors[colorName] || colors.reset
   return colorToUse + message + colors.reset
 }
