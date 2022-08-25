@@ -71,7 +71,7 @@ exec(
 )
 if (!noIndex && exists(tmpPath + 'indexes')) {
   log('Restoring Indexes')
-  exec('mongo ' + databaseName + ' ' + tmpPath + 'indexes')
+  exec('mongo --norc ' + databaseName + ' ' + tmpPath + 'indexes')
 }
 log('Clearing up')
 exec('rm -rf ' + tmpPath)
