@@ -43,6 +43,8 @@ function exec(cmd) {
 var supportCollectionExclude = !/version: 2/.test(exec('mongo --version'))
 
 var excludeCollections = [
+  'trash',
+  'revision',
   'userActivity',
   'questionResponse',
   'sessions',
