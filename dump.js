@@ -6,6 +6,7 @@ var color = require('./src/color')
 var databaseName = argv._[0]
 var verbose = !!argv.v
 var customExcludes = (argv.e && argv.e.split(',')) || []
+var customIncludes = (argv.i && argv.i.split(',')) || []
 
 function printUsage() {
   console.log('')
@@ -14,6 +15,9 @@ function printUsage() {
   console.log('Options:')
   console.log('\t-v - verbose')
   console.log('\t-e - comma separated list of collections to exclude')
+  console.log(
+    '\t-i - comma separated list of collections to include, overrides default excludes'
+  )
   console.log('\n')
 }
 
@@ -44,7 +48,9 @@ var excludeCollections = [
   'order',
   'uniqueCode',
   'userData'
-].concat(customExcludes)
+]
+  .concat(customExcludes)
+  .filter((collection) => !customIncludes.includes(collection))
 var date = new Date().toISOString().substr(0, 19).replace(/[^\d]/g, '')
 var newDatabaseName = databaseName + '-' + date
 var filename = newDatabaseName + '.tar.zst'

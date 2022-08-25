@@ -66,7 +66,7 @@ OSX:
 
 ## Excluded Collections
 
-[These collections](dump.js#L21-L27) are excluded by default. If you need them please ask the privileged user to include them by editing the dump script.
+[These collections](dump.js#L21-L27) are excluded by default. If you need them please ask the privileged user to include them by providing `-i collectionName` to the dump script, e.g. `./dump.js -i sessions {database name}`.
 
 If you find other big collections that are slowing up your dumps or taking a lot of space please send a PR or edit `dump.js` on a per project bases.
 
