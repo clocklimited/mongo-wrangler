@@ -11,7 +11,7 @@ else
   exit 1
 fi
 
-curl -L --silent "https://w.kco.lc/feature/improvements/dist/restore-$ARCH" -o /tmp/restore
+curl -L --silent "https://w.kco.lc/master/dist/restore-$ARCH" -o /tmp/restore
 
 chmod +x /tmp/restore
 
