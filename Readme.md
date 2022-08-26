@@ -26,7 +26,7 @@ To keep customer data safe and reduce the liability on developers, live database
 
 **Privileged user:** 💬 You are most welcome. 😄 Have a great day! 🎈
 
-*Note: This is a clock.co.uk specific workflow!*
+_Note: This is a clock.co.uk specific workflow!_
 
 ## Dependencies
 
@@ -46,15 +46,25 @@ OSX:
 
 2. If this is your first dump 💩
 
-    `git clone https://github.com/clocklimited/mongo-wrangler.git`
+`git clone https://github.com/clocklimited/mongo-wrangler.git`
 
-3. `cd mongo-wrangler`
+`cd mongo-wrangler`
 
-4. `./dump.js {database name}`
+Then either:
 
-4.1 If you want to exclude additional collections use `-e` `./dump.js -e member,subscriber,duck,log {database name}`
+If you have node installed -
 
-5. Check the output for instructions and copy and paste the onliner
+`./dump.js {database name}`
+
+If you want to exclude additional collections use `-e` `./dump.js -e member,subscriber,duck,log {database name}`
+
+Or, using the binary - no node required:
+
+```
+./dump.sh database-name
+```
+
+5. Check the output for instructions and copy and paste the correct onliner
 
 6. Send to the requester
 
@@ -66,7 +76,7 @@ OSX:
 
 ## Excluded Collections
 
-[These collections](dump.js#L21-L27) are excluded by default. If you need them please ask the privileged user to include them by editing the dump script.
+[These collections](dump.js#L21-L27) are excluded by default. If you need them please ask the privileged user to include them by providing `-i collectionName` to the dump script, e.g. `./dump.js -i sessions {database name}`.
 
 If you find other big collections that are slowing up your dumps or taking a lot of space please send a PR or edit `dump.js` on a per project bases.
 
@@ -74,11 +84,19 @@ If you find other big collections that are slowing up your dumps or taking a lot
 
 Properties containing [these properties](obfuscate.js#L1) are obfuscated by default. This can cause some data you don't want getting obfuscated. You'll have to ask the privileged to do a customer dump or submit a PR if this causes a problem.
 
+## Cross-platform
+
+The latest version of mongo-wrangler supports two executables for Node-free dumping and restoration.
+
+Linux and MacOS binaries are available in `dist/`. You simply need to clone the repo and use these as you would through Node. Some options are supported via environment variables.
+
+Or, you can use the automatic cross-platform scripts at `dump.sh` or `restore.sh`.
+
 ## Troubleshooting
 
 ### You need to be on node 0.11+
 
-You should be able to do to get a newer runtime:
+If you are developing changes to mongo-wrangler, you should be able to do to get a newer runtime:
 
 `nave use stable`
 
@@ -91,13 +109,13 @@ bash ./nave.sh use stable
 
 ### Verbose Mode
 
-Add `-v` on either command to see the commands run and get verbose output
+Add `-v` or `VERBOSE=1` on either command to see the commands run and get verbose output
 
 ### Mongo 2 Failing because of invalid indexes
 
-Use `-n` to ignore indexes on restore
+Use `-n` or `NO_INDEX=1` to ignore indexes on restore
 
-`	./restore.js -n {DB} {URL}`
+` ./restore.js -n {DB} {URL}`
 
 ### Xfer
 
