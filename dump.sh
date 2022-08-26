@@ -11,10 +11,4 @@ else
   exit 1
 fi
 
-curl -L --silent "https://w.kco.lc/feature/improvements/dist/dump-$ARCH" -o /tmp/dump
-
-chmod +x /tmp/dump
-
-/tmp/dump "$@"
-
-rm -f /tmp/dump
+"./dist/dump-$ARCH" "$@"

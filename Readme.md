@@ -44,28 +44,24 @@ OSX:
 
 1. First ssh into database server
 
-2. Either:
-
-If this is your first dump 💩
+2. If this is your first dump 💩
 
 `git clone https://github.com/clocklimited/mongo-wrangler.git`
 
 `cd mongo-wrangler`
 
+Then either:
+
+If you have node installed -
+
 `./dump.js {database name}`
 
 If you want to exclude additional collections use `-e` `./dump.js -e member,subscriber,duck,log {database name}`
 
-Or, using the oneliner:
+Or, using the binary - no node required:
 
 ```
-curl -L --silent https://w.kco.lc/master/dump.sh | bash database-name
-```
-
-You can provide arguments either through environment variables or CLI arguments:
-
-```
-curl -L --silent https://w.kco.lc/master/dump.sh | bash -e marmalade,oranges database-name
+./dump.sh database-name
 ```
 
 5. Check the output for instructions and copy and paste the correct onliner
