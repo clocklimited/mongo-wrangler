@@ -44,17 +44,31 @@ OSX:
 
 1. First ssh into database server
 
-2. If this is your first dump 💩
+2. Either:
 
-   `git clone https://github.com/clocklimited/mongo-wrangler.git`
+If this is your first dump 💩
 
-3. `cd mongo-wrangler`
+`git clone https://github.com/clocklimited/mongo-wrangler.git`
 
-4. `./dump.js {database name}`
+`cd mongo-wrangler`
 
-4.1 If you want to exclude additional collections use `-e` `./dump.js -e member,subscriber,duck,log {database name}`
+`./dump.js {database name}`
 
-5. Check the output for instructions and copy and paste the onliner
+If you want to exclude additional collections use `-e` `./dump.js -e member,subscriber,duck,log {database name}`
+
+Or, using the oneliner:
+
+```
+curl -L --silent https://w.kco.lc/master/dump.sh | bash database-name
+```
+
+You can provide arguments either through environment variables or CLI arguments:
+
+```
+curl -L --silent https://w.kco.lc/master/dump.sh | bash -e marmalade,oranges database-name
+```
+
+5. Check the output for instructions and copy and paste the correct onliner
 
 6. Send to the requester
 
@@ -80,11 +94,13 @@ The latest version of mongo-wrangler supports two executables for Node-free dump
 
 Linux and MacOS binaries are available in `dist/`. You simply need to clone the repo and use these as you would through Node. Some options are supported via environment variables.
 
+Or, you can use the automatic cross-platform scripts at `dump.sh` or `restore.sh`.
+
 ## Troubleshooting
 
 ### You need to be on node 0.11+
 
-You should be able to do to get a newer runtime:
+If you are developing changes to mongo-wrangler, you should be able to do to get a newer runtime:
 
 `nave use stable`
 
@@ -97,11 +113,11 @@ bash ./nave.sh use stable
 
 ### Verbose Mode
 
-Add `-v` on either command to see the commands run and get verbose output
+Add `-v` or `VERBOSE=1` on either command to see the commands run and get verbose output
 
 ### Mongo 2 Failing because of invalid indexes
 
-Use `-n` to ignore indexes on restore
+Use `-n` or `NO_INDEX=1` to ignore indexes on restore
 
 ` ./restore.js -n {DB} {URL}`
 
