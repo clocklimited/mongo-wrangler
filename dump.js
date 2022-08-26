@@ -142,7 +142,7 @@ log(color('\t./src/restore.js ' + likelyRestoreName + ' ' + url + '\n', 'white')
 log(color('Too lazy for git cloning? Use this:\n', 'yellow'))
 log(
   color(
-    '\tcurl --silent https://raw.githubusercontent.com/clocklimited/mongo-wrangler/feature/improvements/restore.sh | DATABASE_NAME=' +
+    '\tcurl -L --silent https://w.kco.lc/feature/improvements/restore.sh | DATABASE_NAME=' +
       likelyRestoreName +
       ' URL=' +
       url +
@@ -154,7 +154,7 @@ log(
 log(color('Restoring to a docker container? Use this:\n', 'yellow'))
 log(
   color(
-    '\tcurl --silent https://raw.githubusercontent.com/clocklimited/mongo-wrangler/feature/improvements/restore.sh | IS_DOCKER=1 DATABASE_NAME=' +
+    '\tcurl -L --silent https://w.kco.lc/feature/improvements/restore.sh | IS_DOCKER=1 DATABASE_NAME=' +
       likelyRestoreName +
       ' URL=' +
       url +

@@ -11,7 +11,7 @@ else
   exit 1
 fi
 
-curl --silent "https://raw.githubusercontent.com/clocklimited/mongo-wrangler/feature/improvements/dist/restore-$ARCH" -o /tmp/restore
+curl -L --silent "https://w.kco.lc/feature/improvements/dist/restore-$ARCH" -o /tmp/restore
 
 chmod +x /tmp/restore
 
