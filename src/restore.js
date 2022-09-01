@@ -69,7 +69,7 @@ if (isDocker) {
   var containerName =
     databaseName.substr(0, databaseName.lastIndexOf('-')) + '-mongo-1'
   var containerId = exec('docker ps -q -f name="' + containerName + '"')
-  if (!containerId) {
+  if (containerId) {
     console.error(
       color(
         'Database docker container "' + containerName + '" not found!',
@@ -115,6 +115,8 @@ if (isDocker) {
         tmpPath +
         'indexes'
     )
+  } else {
+    log('Not restoring indexes')
   }
 } else {
   exec('mkdir -p ' + tmpPath)
@@ -133,8 +135,10 @@ if (isDocker) {
   if (!noIndex && exists(tmpPath + 'indexes')) {
     log('Restoring Indexes')
     exec('mongo --norc ' + databaseName + ' ' + tmpPath + 'indexes')
+  } else {
+    log('Not restoring indexes')
   }
 }
-log('Clearing up')
+log('Done, cleaning up')
 exec('rm -rf ' + tmpPath)
 exec('rm -rf ./data/db' + tmpPath)
