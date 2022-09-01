@@ -76,6 +76,7 @@ if (isDocker) {
         'red'
       )
     )
+    console.error(color('Have you started the project\'s docker containers?', 'red'))
     process.exit(1)
   }
   var hasDatabaseDataDir = exists('./data/db/')
@@ -83,6 +84,7 @@ if (isDocker) {
     console.error(
       color('Could not find ./data/db directory to restore dump!', 'red')
     )
+    console.error(color('Please restore from the project root.', 'red'))
     process.exit(1)
   }
   exec('mkdir -p ./data/db' + tmpPath)
