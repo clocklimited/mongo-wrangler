@@ -10,6 +10,7 @@ var databaseName = argv._[0]
 var verbose = !!argv.v
 var customExcludes = (argv.e && argv.e.split(',')) || []
 var customIncludes = (argv.i && argv.i.split(',')) || []
+var customOnly = (argv.only && argv.only.split(',')) || []
 
 function printUsage() {
   log('')
@@ -22,7 +23,9 @@ function printUsage() {
   log(
     '\t-i - comma separated list of collections to include, overrides default excludes'
   )
-  log('\n')
+  log(
+    '\t--only - comma separated list of collections to include, will only dump these collections'
+  )
 }
 
 if (!databaseName) {
@@ -57,6 +60,7 @@ var excludeCollections = [
 ]
   .concat(customExcludes)
   .filter((collection) => !customIncludes.includes(collection))
+
 var date = new Date().toISOString().substr(0, 19).replace(/[^\d]/g, '')
 var newDatabaseName = databaseName + '-' + date
 var filename = newDatabaseName + '.tar.zst'
@@ -65,12 +69,32 @@ var likelyRestoreName = databaseName.replace(
   'development'
 )
 log(color('\n💩\tDumping', 'grey'), color(databaseName, 'yellow'))
-log(
-  color('\n❌\tExcluding collections', 'grey'),
-  color(excludeCollections.join(', '), 'green')
-)
+if (customOnly.length) {
+  log(
+    color('\tOnly dumping collections:', 'grey'),
+    color(customOnly.join(', '), 'yellow')
+  )
+} else {
+  log(
+    color('\n❌\tExcluding collections', 'grey'),
+    color(excludeCollections.join(', '), 'green')
+  )
+}
+
 exec('rm -rf dump indexes')
-if (supportCollectionExclude) {
+if (customOnly.length) {
+  customOnly.forEach(function (collection) {
+    exec(
+      'mongodump -c ' +
+        collection +
+        ' ' +
+        (!verbose ? '--quiet' : '') +
+        ' --db ' +
+        databaseName
+    )
+  })
+
+} else if (supportCollectionExclude) {
   exec(
     'mongodump ' +
       (!verbose ? '--quiet' : '') +
@@ -138,7 +162,9 @@ log(
     'yellow'
   )
 )
-log(color('\t./src/restore.js ' + likelyRestoreName + ' ' + url + '\n', 'white'))
+log(
+  color('\t./src/restore.js ' + likelyRestoreName + ' ' + url + '\n', 'white')
+)
 log(color('Too lazy for git cloning? Use this:\n', 'yellow'))
 log(
   color(
