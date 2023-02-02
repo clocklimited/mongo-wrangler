@@ -3,7 +3,7 @@
     "pkg": "^5.8.0"
   },
   "scripts": {
-    "build": "yarn build-file src/restore.js && yarn build-file dump.js",
+    "build": "yarn build-file src/restore.js && yarn build-file dump.js && yarn build-file dump-nf.js",
     "build-file": "pkg --target latest-linux,latest-macos --out-path dist --compress GZip"
   }
 }
