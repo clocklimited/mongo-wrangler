@@ -1,13 +1,9 @@
 #!/usr/bin/env node
-var path = require('path')
-var execSync = require('child_process').execSync
-var argv = require('./src/minimist')(process.argv.slice(2), {
-  boolean: ['v', 'bland']
-})
-var log = require('./src/log')(argv.bland)
-var color = require('./src/color')(argv.bland)
+var bland = !!process.env.BLAND
+var log = require('./src/log')(bland)
+var color = require('./src/color')(bland)
 var databaseName = process.env.DB_NAME
-var verbose = !!argv.v
+var verbose = !!process.env.VERBOSE
 var customExcludes =
   (process.env.EXCLUDES && process.env.EXCLUDES.split(',')) || []
 var customIncludes =
@@ -19,7 +15,7 @@ var output = process.env.OUTPUT
 function printUsage() {
   log('')
   log('Usage:')
-  log('\t' + path.basename(process.argv[1]) + ' [options] database')
+  log('\t[options] database')
   log('Options:')
   log('\t-v - verbose')
   log('\t--bland - removes emoji and colour from output')
@@ -39,13 +35,12 @@ if (!databaseName) {
 }
 
 function exec(cmd) {
-  log(cmd)
-  // const output = execSync(cmd).toString()
-  // if (verbose) {
-  //   log('$ ' + color(cmd, 'dark grey'))
-  //   log(output)
-  // }
-  // return output
+  const output = execSync(cmd).toString()
+  if (verbose) {
+    log('$ ' + color(cmd, 'dark grey'))
+    log(output)
+  }
+  return output
 }
 
 var excludeCollections = [
