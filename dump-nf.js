@@ -113,7 +113,7 @@ log(
   color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow')
 )
 exec(
-  `mongorestore "${output}" --noIndexRestore ${verbose} -d ${newDatabaseName} dump/${databaseName}`
+  `mongorestore "${output}" --nsFrom "${databaseName}.*" --nsTo "${newDatabaseName}.*" --noIndexRestore ${verbose} -d ${newDatabaseName} dump/${databaseName}`
 )
 
 log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
