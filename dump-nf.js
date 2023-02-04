@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+var execSync = require('child_process').execSync
 var bland = !!process.env.BLAND
 var log = require('./src/log')(bland)
 var color = require('./src/color')(bland)
