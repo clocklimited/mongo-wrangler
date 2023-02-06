@@ -107,7 +107,7 @@ if (customOnly.length) {
 
 log(color('\n💩\tDumping indexes', 'grey'), color(databaseName, 'yellow'))
 exec(
-  `mongo --uri="${input}" --norc --quiet ${databaseName} index-getter.js > indexes`
+  `mongo "${input}" --norc --quiet ${databaseName} index-getter.js > indexes`
 )
 
 log(
