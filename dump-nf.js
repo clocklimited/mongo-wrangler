@@ -36,11 +36,16 @@ if (!databaseName) {
 }
 
 function exec(cmd) {
-  const output = execSync(cmd).toString()
-  if (verbose) {
+  if (true) {
     log('$ ' + color(cmd, 'dark grey'))
+  }
+
+  const output = execSync(cmd).toString()
+
+  if (true) {
     log(output)
   }
+
   return output
 }
 
