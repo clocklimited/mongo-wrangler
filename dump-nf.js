@@ -91,15 +91,15 @@ var db = `--db ${databaseName}`
 exec('rm -rf dump indexes')
 if (customOnly.length) {
   customOnly.forEach(function (collection) {
-    exec(`mongodump "${input}" -c ${collection} ${verbose} ${db}`)
+    exec(`mongodump --uri="${input}" -c ${collection} ${verbose} ${db}`)
   })
 } else {
   exec(
-    `mongodump "${input}" ${verbose} ${db}` +
+    `mongodump --uri="${input}" ${verbose}` +
       ' ' +
       excludeCollections
         .map(function (collection) {
-          return '--excludeCollection ' + collection
+          return '--excludeCollection=' + collection
         })
         .join(' ')
   )
@@ -107,14 +107,14 @@ if (customOnly.length) {
 
 log(color('\n💩\tDumping indexes', 'grey'), color(databaseName, 'yellow'))
 exec(
-  `mongo "${input}" --norc --quiet ${databaseName} index-getter.js > indexes`
+  `mongo --uri="${input}" --norc --quiet ${databaseName} index-getter.js > indexes`
 )
 
 log(
   color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow')
 )
 exec(
-  `mongorestore "${output}" --noIndexRestore ${verbose} -d ${newDatabaseName} dump/${databaseName}`
+  `mongorestore --uri"${output}" --noIndexRestore ${verbose} -d=${newDatabaseName} dump/${databaseName}`
 )
 
 log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
