@@ -133,7 +133,6 @@ var url = exec(
     filename
 ).toString()
 exec('rm -rf dump indexes')
-exec(`echo "db.dropDatabase()" | mongo "${output}" --norc ${newDatabaseName}`)
 
 log(color('\n✅\tHow to restore the 💩\n', 'white'))
 log(
