@@ -30,3 +30,8 @@ do
 done
 
 "./dist/dump-nf-$ARCH" "$@"
+
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer $NF_API_TOKEN" \
+  --request DELETE \
+  https://api.northflank.com/v1/projects/northampton-saints/addons/${ADDON_ID}
