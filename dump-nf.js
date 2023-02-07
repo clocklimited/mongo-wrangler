@@ -118,7 +118,12 @@ exec(
 )
 
 log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
-exec(`mongo "${output}" --norc ${newDatabaseName} ./obfuscate.js`)
+exec(
+  `mongo "${output.replace(
+    '/?',
+    `/${newDatabaseName}?`
+  )}" --norc ./obfuscate.js`
+)
 exec('rm -rf dump')
 log(color('💩\tDumping ' + newDatabaseName, 'grey'))
 exec(`mongodump "${output}" ${verbose} --db ${newDatabaseName}`)
