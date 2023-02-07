@@ -5,6 +5,6 @@ WORKDIR /usr/src/app
 COPY . .
 
 RUN apt update
-RUN apt -y install zstd jq
+RUN apt -y install zstd jq curl
 
 CMD [ "/usr/src/app/dump-nf.sh" ]
