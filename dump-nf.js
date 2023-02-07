@@ -108,13 +108,13 @@ if (customOnly.length) {
 }
 
 log(color('\n💩\tDumping indexes', 'grey'), color(databaseName, 'yellow'))
-exec(`mongo "${input}" --norc --verbose index-getter.js > indexes`)
+exec(`mongo "${input}" --norc --quiet index-getter.js > indexes`)
 
 log(
   color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow')
 )
 exec(
-  `mongorestore --uri"${output}" --noIndexRestore ${verbose} -d=${newDatabaseName} dump/${databaseName}`
+  `mongorestore --uri="${output}" --noIndexRestore ${verbose} -d=${newDatabaseName} dump/${databaseName}`
 )
 
 log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))

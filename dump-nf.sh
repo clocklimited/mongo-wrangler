@@ -12,4 +12,9 @@ OUTPUT=$(curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer $NF_API_TOKEN" \
   https://api.northflank.com/v1/projects/northampton-saints/addons/$ADDON_ID/credentials | jq -r '.data.envs.MONGO_SRV_ADMIN' | sed s#/admin#/#)
 
+echo $ADDON_ID
+echo $OUTPUT
+
+echo $NF_API_TOKEN
+
 "./dist/dump-nf-$ARCH" "$@"
