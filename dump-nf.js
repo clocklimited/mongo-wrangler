@@ -108,9 +108,7 @@ if (customOnly.length) {
 }
 
 log(color('\n💩\tDumping indexes', 'grey'), color(databaseName, 'yellow'))
-exec(
-  `mongo "${input}" --norc --verbose ${databaseName} index-getter.js > indexes`
-)
+exec(`mongo "${input}" --norc --verbose index-getter.js > indexes`)
 
 log(
   color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow')
