@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-ARCH='linux'
-
 export ADDON_ID=$(curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer $NF_API_TOKEN" \
   --request POST \
@@ -29,7 +27,7 @@ do
   sleep 5
 done
 
-"./dist/dump-nf-$ARCH" "$@"
+node ./dump-nf.js
 
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer $NF_API_TOKEN" \

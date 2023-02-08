@@ -16,34 +16,39 @@ var output = process.env.OUTPUT
 
 function printUsage() {
   log('')
-  log('Usage:')
-  log('\t[options] database')
-  log('Options:')
-  log('\t-v - verbose')
-  log('\t--bland - removes emoji and colour from output')
-  log('\t-e - comma separated list of collections to exclude')
+  log('Usage (env vars) (required):')
+  log('\tINPUT_DB_NAME - name of the DB you want to wrangle')
+  log('\tINPUT - MongoDB connection string for the DB')
+  log('\tOUTPUT_DB_NAME - what you would like the wranlged DB to be called')
   log(
-    '\t-i - comma separated list of collections to include, overrides default excludes'
+    '\tOUTPUT - MongoDB connection string where the obfuscation step should take place'
+  )
+  log('Options (env vars) (unrequired):')
+  log('\tVERBOSE - log stuff')
+  log('\tBLAND- removes emoji and colour from output')
+  log('\tEXCLUDES - comma separated list of collections to exclude')
+  log(
+    '\tINCLUDES - comma separated list of collections to include, overrides default excludes'
   )
   log(
-    '\t--only - comma separated list of collections to include, will only dump these collections'
+    '\tONLY - comma separated list of collections to include, will only dump these collections'
   )
 }
 
-if (!databaseName) {
-  console.error(color('Missing database name', 'red'))
+if (!inputDatabaseName || !databaseName || !input || !output) {
+  console.error(color('Missing required env var', 'red'))
   printUsage()
   process.exit(1)
 }
 
 function exec(cmd) {
-  if (true) {
+  if (verbose) {
     log('$ ' + color(cmd, 'dark grey'))
   }
 
   const output = execSync(cmd).toString()
 
-  if (true) {
+  if (verbose) {
     log(output)
   }
 
@@ -89,9 +94,6 @@ if (customOnly.length) {
 var verbose = !verbose ? '--quiet' : ''
 var db = `--db ${inputDatabaseName}`
 
-exec('mongo --version')
-exec('mongodump --version')
-exec('rm -rf dump indexes')
 if (customOnly.length) {
   customOnly.forEach(function (collection) {
     exec(`mongodump --uri="${input}" -c ${collection} ${verbose} ${db}`)
@@ -125,7 +127,6 @@ exec(
     `/${newDatabaseName}?`
   )}" --norc ./obfuscate.js`
 )
-exec('rm -rf dump')
 log(color('💩\tDumping ' + newDatabaseName, 'grey'))
 exec(`mongodump "${output}" ${verbose} --db ${newDatabaseName}`)
 log(color('🗜\tCompressing and uploading to xfer', 'grey'))
@@ -133,7 +134,6 @@ var url = exec(
   'tar -cf - dump indexes | zstd | curl --silent -H "Max-Days: 1" -H "Max-Downloads: 50" --upload-file - https://xfer.clock.co.uk/' +
     filename
 ).toString()
-exec('rm -rf dump indexes')
 
 log(color('\n✅\tHow to restore the 💩\n', 'white'))
 log(
