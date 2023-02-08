@@ -3,7 +3,8 @@ var execSync = require('child_process').execSync
 var bland = !!process.env.BLAND
 var log = require('./src/log')(bland)
 var color = require('./src/color')(bland)
-var databaseName = process.env.DB_NAME
+var inputDatabaseName = process.env.INPUT_DB_NAME
+var databaseName = process.env.OUTPUT_DB_NAME
 var verbose = !!process.env.VERBOSE
 var customExcludes =
   (process.env.EXCLUDES && process.env.EXCLUDES.split(',')) || []
@@ -86,13 +87,14 @@ if (customOnly.length) {
 }
 
 var verbose = !verbose ? '--quiet' : ''
+var db = `--db ${inputDatabaseName}`
 
 exec('mongo --version')
 exec('mongodump --version')
 exec('rm -rf dump indexes')
 if (customOnly.length) {
   customOnly.forEach(function (collection) {
-    exec(`mongodump --uri="${input}" -c ${collection} ${verbose}`)
+    exec(`mongodump --uri="${input}" -c ${collection} ${verbose} ${db}`)
   })
 } else {
   exec(
@@ -113,7 +115,7 @@ log(
   color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow')
 )
 exec(
-  `mongorestore --uri="${output}" --noIndexRestore ${verbose} -d=${newDatabaseName} dump/${databaseName}`
+  `mongorestore --uri="${output}" --noIndexRestore ${verbose} -d=${newDatabaseName} dump/${inputDatabaseName}`
 )
 
 log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
