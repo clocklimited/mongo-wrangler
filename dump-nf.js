@@ -86,14 +86,13 @@ if (customOnly.length) {
 }
 
 var verbose = !verbose ? '--quiet' : ''
-var db = `--db ${databaseName}`
 
 exec('mongo --version')
 exec('mongodump --version')
 exec('rm -rf dump indexes')
 if (customOnly.length) {
   customOnly.forEach(function (collection) {
-    exec(`mongodump --uri="${input}" -c ${collection} ${verbose} ${db}`)
+    exec(`mongodump --uri="${input}" -c ${collection} ${verbose}`)
   })
 } else {
   exec(
