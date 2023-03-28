@@ -11,10 +11,6 @@ export OUTPUT=$(curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer $NF_API_TOKEN" \
   https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ADDON_ID/credentials | jq -r '.data.envs.MONGO_SRV_ADMIN' | sed s#/admin#/#)
 
-echo $ADDON_ID
-echo $OUTPUT
-echo $NF_API_TOKEN
-
 STATUS=preDeployment
 
 while [[ $STATUS != 'running' ]]
