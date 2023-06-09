@@ -29,20 +29,16 @@ function isClock(value) {
   return value.toLowerCase().indexOf('clock.co.uk') !== -1
 }
 
-var lowerChars = 'abcdefghijklmnopqrstuvwxyz'
+var lowerChars = 'abcdefghijklmnopqrstuvwxyz1234567890'
 var upperChars = lowerChars.toUpperCase()
-var numbers = '1234567890'
 
 function obfuscate(value) {
   return value
-    .replace(/[a-z]/g, function () {
-      return lowerChars[Math.floor(Math.random() * 26)]
+    .replace(/[a-z0-9]/g, function () {
+      return lowerChars[Math.floor(Math.random() * 36)]
     })
     .replace(/[A-Z]/g, function () {
       return upperChars[Math.floor(Math.random() * 26)]
-    })
-    .replace(/[0-9]/g, function () {
-      return numbers[Math.floor(Math.random() * 10)]
     })
 }
 
