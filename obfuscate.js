@@ -31,6 +31,7 @@ function isClock(value) {
 
 var lowerChars = 'abcdefghijklmnopqrstuvwxyz'
 var upperChars = lowerChars.toUpperCase()
+var numbers = '1234567890'
 
 function obfuscate(value) {
   return value
@@ -39,6 +40,9 @@ function obfuscate(value) {
     })
     .replace(/[A-Z]/g, function () {
       return upperChars[Math.floor(Math.random() * 26)]
+    })
+    .replace(/[0-9]/g, function () {
+      return numbers[Math.floor(Math.random() * 10)]
     })
 }
 
@@ -81,7 +85,12 @@ db.getCollectionNames().forEach(function (collectionName) {
     var keys = Object.keys(document)
     var totalKeys = keys.length
 
-    function obs (document, key) {
+    collectionPrivateKeyMap = updatePrivateKeyMap(
+      document,
+      collectionPrivateKeyMap
+    )
+    for (var i = 0; i < totalKeys; i++) {
+      var key = keys[i]
       if (typeof document[key] === 'string') {
         if (isClock(document[key])) {
           found = false
@@ -97,22 +106,12 @@ db.getCollectionNames().forEach(function (collectionName) {
           found = true
           document[key] = obfuscate(document[key])
         }
+      } else if (Array.isArray(document[key]) && collectionPrivateKeyMap[key]) {
+        found = true
+        document[key] = document[key].map((value) => obfuscate(value))
       }
     }
 
-    collectionPrivateKeyMap = updatePrivateKeyMap(
-      document,
-      collectionPrivateKeyMap
-    )
-
-    for (var i = 0; i < totalKeys; i++) {
-      var key = keys[i]
-      if (Array.isArray(document[key])) {
-        document[key] = document[key].map((value) => blah)
-      } else {
-      obs(document, key)
-      }
-    }
     if (found) {
       collection.save(document)
       counter += 1
