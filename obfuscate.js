@@ -33,6 +33,7 @@ var lowerChars = 'abcdefghijklmnopqrstuvwxyz1234567890'
 var upperChars = lowerChars.toUpperCase()
 
 function obfuscate(value) {
+  if(!value) return value
   return value
     .replace(/[a-z0-9]/g, function () {
       return lowerChars[Math.floor(Math.random() * 36)]
