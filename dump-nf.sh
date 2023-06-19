@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+variables=("NF_API_TOKEN" "PROJECT_NAME" "INPUT" "INPUT_DB_NAME" "OUTPUT_DB_NAME")
+
+for variable_name in "${variables[@]}"; do
+  if [ -z "${!variable_name}" ]; then
+    echo "Missing required variable: '$variable_name'"
+    exit 1
+  fi
+done
+
 DATE=$(date +%Y%m%d-%H%M%S)
 export ADDON_ID=$(curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer $NF_API_TOKEN" \
