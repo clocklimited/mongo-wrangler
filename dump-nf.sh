@@ -1,15 +1,37 @@
 #!/usr/bin/env bash
 
-variables=("NF_API_TOKEN" "PROJECT_NAME" "INPUT" "INPUT_DB_NAME" "OUTPUT_DB_NAME")
+VARIABLES=(
+  "NF_API_TOKEN"
+  "PROJECT_NAME"
+  "INPUT"
+  "INPUT_DB_NAME"
+  "OUTPUT_DB_NAME"
+  "NF_OBJECT_ID"
+)
 
-for variable_name in "${variables[@]}"; do
-  if [ -z "${!variable_name}" ]; then
-    echo "Missing required variable: '$variable_name'"
+for VARIABLE_NAME in "${VARIABLES[@]}"; do
+  if [ -z "${!VARIABLE_NAME}" ]; then
+    echo "Missing required variable: '$VARIABLE_NAME'"
     exit 1
   fi
 done
 
 DATE=$(date +%Y%m%d-%H%M%S)
+ENVIRONMENT=${NF_OBJECT_ID#mongo-wrangler-}
+
+DATABASE_ADDON=$(
+  curl --silent \
+    --header "Authorization: Bearer $NF_API_TOKEN" \
+    --request GET \
+    "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ENVIRONMENT-database"
+)
+DATABASE_MONGO_VERSION=$(jq -r '.data.spec.config.versionTag' <<<"$DATABASE_ADDON")
+
+if [ -z "$DATABASE_MONGO_VERSION" ] || [ "$DATABASE_MONGO_VERSION" == "null" ]; then
+  echo "Could not determine addon MongoDB version - check NF_API_TOKEN access"
+  exit 1
+fi
+
 export ADDON_ID=$(curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer $NF_API_TOKEN" \
   --request POST \
