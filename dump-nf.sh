@@ -46,9 +46,9 @@ WRANGLER_ADDON=$(
     "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons"
 )
 
-ADDON_ID=$(jq -r '.data.id' <<< "$WRANGLER_ADDON")
+ADDON_ID=$(jq -r '.data.id' <<<"$WRANGLER_ADDON")
 export ADDON_ID
-STATUS=$(jq -r '.data.status' <<< "$WRANGLER_ADDON")
+STATUS=$(jq -r '.data.status' <<<"$WRANGLER_ADDON")
 
 if [ -z "$ADDON_ID" ] || [ "$ADDON_ID" == "null" ]; then
   echo "Could not create wrangler addon - check NF_API_TOKEN access"
@@ -57,9 +57,14 @@ else
   echo "Temporary addon created successfully, status: '$STATUS'"
 fi
 
-export OUTPUT=$(curl --header "Content-Type: application/json" \
-  --header "Authorization: Bearer $NF_API_TOKEN" \
-  "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ADDON_ID/credentials" | jq -r '.data.envs.MONGO_SRV_ADMIN' | sed s#/admin#/#)
+WRANGLER_ADDON_CREDENTIALS=$(
+  curl --silent \
+    --header "Content-Type: application/json" \
+    --header "Authorization: Bearer $NF_API_TOKEN" \
+    "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ADDON_ID/credentials"
+)
+OUTPUT=$(jq -r '.data.envs.MONGO_SRV_ADMIN' <<< "$WRANGLER_ADDON_CREDENTIALS" | sed s\#/admin\#/\#)
+export OUTPUT
 
 while [[ $STATUS != 'running' ]]; do
   STATUS=$(
