@@ -17,6 +17,7 @@ for VARIABLE_NAME in "${VARIABLES[@]}"; do
 done
 
 DATE=$(date +%Y%m%d-%H%M%S)
+WRANGLER_ADDON_NAME="mongo-wrangler-$DATE"
 ENVIRONMENT=${NF_OBJECT_ID#mongo-wrangler-}
 
 DATABASE_ADDON=$(
@@ -25,24 +26,40 @@ DATABASE_ADDON=$(
     --request GET \
     "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ENVIRONMENT-database"
 )
-DATABASE_MONGO_VERSION=$(jq -r '.data.spec.config.versionTag' <<<"$DATABASE_ADDON")
+DATABASE_MONGO_VERSION=$(jq -r '.data.spec.config.versionTag' <<< "$DATABASE_ADDON")
 
 if [ -z "$DATABASE_MONGO_VERSION" ] || [ "$DATABASE_MONGO_VERSION" == "null" ]; then
   echo "Could not determine addon MongoDB version - check NF_API_TOKEN access"
   exit 1
+else
+  echo "Valid NF_API_TOKEN provided"
 fi
 
-export ADDON_ID=$(curl --header "Content-Type: application/json" \
-  --header "Authorization: Bearer $NF_API_TOKEN" \
-  --request POST \
-  --data '{"name":"mongo-wrangler-'"$DATE"'","description":"Ad-hoc mongo-wrangler db","type":"mongodb","version":"4.2.21","billing":{"deploymentPlan":"nf-compute-100-4","storageClass":"ssd","storage":4096,"replicas":1}}' \
-  "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons" | jq -r '.data.id')
+echo "Creating temporary addon '$WRANGLER_ADDON_NAME' with version '$DATABASE_MONGO_VERSION'"
+
+WRANGLER_ADDON=$(
+  curl --silent \
+    --header "Content-Type: application/json" \
+    --header "Authorization: Bearer $NF_API_TOKEN" \
+    --request POST \
+    --data '{"name":"'"$WRANGLER_ADDON_NAME"'","description":"Ad-hoc mongo-wrangler db","type":"mongodb","version":"'"$DATABASE_MONGO_VERSION"'","billing":{"deploymentPlan":"nf-compute-100-4","storageClass":"ssd","storage":4096,"replicas":1}}' \
+    "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons"
+)
+
+ADDON_ID=$(jq -r '.data.id' <<< "$WRANGLER_ADDON")
+export ADDON_ID
+STATUS=$(jq -r '.data.status' <<< "$WRANGLER_ADDON")
+
+if [ -z "$ADDON_ID" ] || [ "$ADDON_ID" == "null" ]; then
+  echo "Could not create wrangler addon - check NF_API_TOKEN access"
+  exit 1
+else
+  echo "Temporary addon created successfully, status: '$STATUS'"
+fi
 
 export OUTPUT=$(curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer $NF_API_TOKEN" \
   "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ADDON_ID/credentials" | jq -r '.data.envs.MONGO_SRV_ADMIN' | sed s#/admin#/#)
-
-STATUS=preDeployment
 
 while [[ $STATUS != 'running' ]]; do
   STATUS=$(
