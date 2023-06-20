@@ -26,7 +26,7 @@ DATABASE_ADDON=$(
     --request GET \
     "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ENVIRONMENT-database"
 )
-DATABASE_MONGO_VERSION=$(jq -r '.data.spec.config.versionTag' <<< "$DATABASE_ADDON")
+DATABASE_MONGO_VERSION=$(jq -r '.data.spec.config.versionTag' <<<"$DATABASE_ADDON")
 
 if [ -z "$DATABASE_MONGO_VERSION" ] || [ "$DATABASE_MONGO_VERSION" == "null" ]; then
   echo "Could not determine addon MongoDB version - check NF_API_TOKEN access"
@@ -63,7 +63,7 @@ WRANGLER_ADDON_CREDENTIALS=$(
     --header "Authorization: Bearer $NF_API_TOKEN" \
     "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ADDON_ID/credentials"
 )
-OUTPUT=$(jq -r '.data.envs.MONGO_SRV_ADMIN' <<< "$WRANGLER_ADDON_CREDENTIALS" | sed s\#/admin\#/\#)
+OUTPUT=$(jq -r '.data.envs.MONGO_SRV_ADMIN' <<<"$WRANGLER_ADDON_CREDENTIALS" | sed s\#/admin\#/\#)
 export OUTPUT
 
 while [[ $STATUS != 'running' ]]; do
