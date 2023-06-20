@@ -29,7 +29,7 @@ DATABASE_ADDON=$(
 DATABASE_MONGO_VERSION=$(jq -r '.data.spec.config.versionTag' <<<"$DATABASE_ADDON")
 
 if [ -z "$DATABASE_MONGO_VERSION" ] || [ "$DATABASE_MONGO_VERSION" == "null" ]; then
-  echo "Could not determine addon MongoDB version - check NF_API_TOKEN access"
+  echo "Could not determine addon MongoDB version - check NF_API_TOKEN access (read)"
   exit 1
 else
   echo "Valid NF_API_TOKEN provided"
@@ -51,7 +51,7 @@ export ADDON_ID
 STATUS=$(jq -r '.data.status' <<<"$WRANGLER_ADDON")
 
 if [ -z "$ADDON_ID" ] || [ "$ADDON_ID" == "null" ]; then
-  echo "Could not create wrangler addon - check NF_API_TOKEN access"
+  echo "Could not create wrangler addon - check NF_API_TOKEN access (create)"
   exit 1
 else
   echo "Temporary addon created successfully, status: '$STATUS'"
@@ -76,9 +76,33 @@ while [[ $STATUS != 'running' ]]; do
   sleep 5
 done
 
+cleanup() {
+  WRANGLER_DELETE=$(
+    curl --silent \
+      --header "Content-Type: application/json" \
+      --header "Authorization: Bearer $NF_API_TOKEN" \
+      --request DELETE \
+      "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ADDON_ID"
+  )
+  WRANGLER_DELETE_ERROR=$(jq -r '.error.status' <<<"$WRANGLER_DELETE")
+
+  if [ -z "$WRANGLER_DELETE_ERROR" ] || [ "$WRANGLER_DELETE_ERROR" == "null" ]; then
+    echo "Temporary addon deleted successfully"
+  else
+    echo "Could not delete wrangler addon - check NF_API_TOKEN access (delete)"
+    exit 1
+  fi
+}
+
+handle_error() {
+  local EXIT_CODE="$?"
+  echo "Failed with exit code $EXIT_CODE"
+  cleanup
+  exit "$EXIT_CODE"
+}
+
+trap 'handle_error' ERR
+
 node ./dump-nf.js
 
-curl --header "Content-Type: application/json" \
-  --header "Authorization: Bearer $NF_API_TOKEN" \
-  --request DELETE \
-  "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/${ADDON_ID}"
+cleanup
