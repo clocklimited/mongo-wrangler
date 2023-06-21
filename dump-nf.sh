@@ -19,17 +19,20 @@ done
 DATE=$(date +%Y%m%d-%H%M%S)
 WRANGLER_ADDON_NAME="mongo-wrangler-$DATE"
 ENVIRONMENT=${NF_OBJECT_ID#mongo-wrangler-}
+DATABASE_ADDON_NAME=${DATABASE_ADDON_NAME:-"$ENVIRONMENT-database"}
+
 
 DATABASE_ADDON=$(
   curl --silent \
     --header "Authorization: Bearer $NF_API_TOKEN" \
     --request GET \
-    "https://api.northflank.com/v1/projects/$NF_PROJECT_ID/addons/$ENVIRONMENT-database"
+    "https://api.northflank.com/v1/projects/$NF_PROJECT_ID/addons/$DATABASE_ADDON_NAME"
 )
 DATABASE_MONGO_VERSION=$(jq -r '.data.spec.config.versionTag' <<<"$DATABASE_ADDON")
 
 if [ -z "$DATABASE_MONGO_VERSION" ] || [ "$DATABASE_MONGO_VERSION" == "null" ]; then
   echo "Could not determine addon MongoDB version - check NF_API_TOKEN access (read)"
+  echo "Or verify database addon with name '$DATABASE_ADDON_NAME' exists"
   exit 1
 else
   echo "Valid NF_API_TOKEN provided"
