@@ -2,7 +2,7 @@
 
 VARIABLES=(
   "NF_API_TOKEN"
-  "PROJECT_NAME"
+  "NF_PROJECT_ID"
   "INPUT"
   "INPUT_DB_NAME"
   "OUTPUT_DB_NAME"
@@ -24,7 +24,7 @@ DATABASE_ADDON=$(
   curl --silent \
     --header "Authorization: Bearer $NF_API_TOKEN" \
     --request GET \
-    "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ENVIRONMENT-database"
+    "https://api.northflank.com/v1/projects/$NF_PROJECT_ID/addons/$ENVIRONMENT-database"
 )
 DATABASE_MONGO_VERSION=$(jq -r '.data.spec.config.versionTag' <<<"$DATABASE_ADDON")
 
@@ -43,7 +43,7 @@ WRANGLER_ADDON=$(
     --header "Authorization: Bearer $NF_API_TOKEN" \
     --request POST \
     --data '{"name":"'"$WRANGLER_ADDON_NAME"'","description":"Ad-hoc mongo-wrangler db","type":"mongodb","version":"'"$DATABASE_MONGO_VERSION"'","billing":{"deploymentPlan":"nf-compute-100-4","storageClass":"ssd","storage":4096,"replicas":1}}' \
-    "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons"
+    "https://api.northflank.com/v1/projects/$NF_PROJECT_ID/addons"
 )
 
 ADDON_ID=$(jq -r '.data.id' <<<"$WRANGLER_ADDON")
@@ -61,14 +61,14 @@ WRANGLER_ADDON_CREDENTIALS=$(
   curl --silent \
     --header "Content-Type: application/json" \
     --header "Authorization: Bearer $NF_API_TOKEN" \
-    "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ADDON_ID/credentials"
+    "https://api.northflank.com/v1/projects/$NF_PROJECT_ID/addons/$ADDON_ID/credentials"
 )
 OUTPUT=$(jq -r '.data.envs.MONGO_SRV_ADMIN' <<<"$WRANGLER_ADDON_CREDENTIALS" | sed s\#/admin\#/\#)
 export OUTPUT
 
 while [[ $STATUS != 'running' ]]; do
   STATUS=$(
-    curl --silent -G "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ADDON_ID" \
+    curl --silent -G "https://api.northflank.com/v1/projects/$NF_PROJECT_ID/addons/$ADDON_ID" \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer $NF_API_TOKEN" | jq -r '.data.status'
   )
@@ -82,7 +82,7 @@ cleanup() {
       --header "Content-Type: application/json" \
       --header "Authorization: Bearer $NF_API_TOKEN" \
       --request DELETE \
-      "https://api.northflank.com/v1/projects/$PROJECT_NAME/addons/$ADDON_ID"
+      "https://api.northflank.com/v1/projects/$NF_PROJECT_ID/addons/$ADDON_ID"
   )
   WRANGLER_DELETE_ERROR=$(jq -r '.error.status' <<<"$WRANGLER_DELETE")
 
