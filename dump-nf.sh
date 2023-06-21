@@ -21,7 +21,6 @@ WRANGLER_ADDON_NAME="mongo-wrangler-$DATE"
 ENVIRONMENT=${NF_OBJECT_ID#mongo-wrangler-}
 DATABASE_ADDON_NAME=${DATABASE_ADDON_NAME:-"$ENVIRONMENT-database"}
 
-
 DATABASE_ADDON=$(
   curl --silent \
     --header "Authorization: Bearer $NF_API_TOKEN" \
@@ -33,6 +32,7 @@ DATABASE_MONGO_VERSION=$(jq -r '.data.spec.config.versionTag' <<<"$DATABASE_ADDO
 if [ -z "$DATABASE_MONGO_VERSION" ] || [ "$DATABASE_MONGO_VERSION" == "null" ]; then
   echo "Could not determine addon MongoDB version - check NF_API_TOKEN access (read)"
   echo "Or verify database addon with name '$DATABASE_ADDON_NAME' exists"
+  echo "Response: $DATABASE_ADDON"
   exit 1
 else
   echo "Valid NF_API_TOKEN provided"
@@ -55,6 +55,7 @@ STATUS=$(jq -r '.data.status' <<<"$WRANGLER_ADDON")
 
 if [ -z "$ADDON_ID" ] || [ "$ADDON_ID" == "null" ]; then
   echo "Could not create wrangler addon - check NF_API_TOKEN access (create)"
+  echo "Response: $WRANGLER_ADDON"
   exit 1
 else
   echo "Temporary addon created successfully, status: '$STATUS'"
@@ -93,6 +94,7 @@ cleanup() {
     echo "Temporary addon deleted successfully"
   else
     echo "Could not delete wrangler addon - check NF_API_TOKEN access (delete)"
+    echo "Response: $WRANGLER_DELETE"
     exit 1
   fi
 }
