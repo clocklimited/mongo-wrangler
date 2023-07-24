@@ -40,23 +40,68 @@ fi
 
 echo "Creating temporary addon '$WRANGLER_ADDON_NAME' with version '$DATABASE_MONGO_VERSION'"
 
-WRANGLER_ADDON=$(
-  curl --silent \
-    --header "Content-Type: application/json" \
-    --header "Authorization: Bearer $NF_API_TOKEN" \
-    --request POST \
-    --data '{"name":"'"$WRANGLER_ADDON_NAME"'","description":"Ad-hoc mongo-wrangler db","type":"mongodb","version":"'"$DATABASE_MONGO_VERSION"'","billing":{"deploymentPlan":"nf-compute-100-4","storageClass":"ssd","storage":4096,"replicas":1}}' \
-    "https://api.northflank.com/v1/projects/$NF_PROJECT_ID/addons"
-)
+create_wrangler_addon() {
+  local wrangler_addon
+  wrangler_addon=$(
+    curl --silent \
+      --header "Content-Type: application/json" \
+      --header "Authorization: Bearer $NF_API_TOKEN" \
+      --request POST \
+      --data '{"name":"'"$WRANGLER_ADDON_NAME"'","description":"Ad-hoc mongo-wrangler db","type":"mongodb","version":"'"$1"'","billing":{"deploymentPlan":"nf-compute-100-4","storageClass":"ssd","storage":4096,"replicas":1}}' \
+      "https://api.northflank.com/v1/projects/$NF_PROJECT_ID/addons"
+  )
+  echo "$wrangler_addon"
+}
+
+WRANGLER_ADDON=$(create_wrangler_addon "$DATABASE_MONGO_VERSION")
 
 ADDON_ID=$(jq -r '.data.id' <<<"$WRANGLER_ADDON")
 export ADDON_ID
 STATUS=$(jq -r '.data.status' <<<"$WRANGLER_ADDON")
 
 if [ -z "$ADDON_ID" ] || [ "$ADDON_ID" == "null" ]; then
-  echo "Could not create wrangler addon - check NF_API_TOKEN access (create)"
-  echo "Response: $WRANGLER_ADDON"
-  exit 1
+  # If the error is related to version, we can re-try
+  ADDON_ERROR_IS_VERSION=$(grep "MongoDB version not supported:" <<<"$WRANGLER_ADDON")
+  if [ -n "$ADDON_ERROR_IS_VERSION" ]; then
+    echo "Creating addon failed due to version incompatibility - trying to find a supported version"
+    SUPPORTED_MONGO_VERSIONS=$(jq -r '.error.details.versions[]' <<<"$WRANGLER_ADDON")
+
+    readarray -t SUPPORTED_MONGO_VERSIONS <<<"$SUPPORTED_MONGO_VERSIONS"
+
+    SUPPORTED_MONGO_VERSION=""
+    for version in "${SUPPORTED_MONGO_VERSIONS[@]}"; do
+      version_without_patch="${version%.*}"
+      version_matches=$(grep "$version_without_patch" <<<"$DATABASE_MONGO_VERSION")
+      if [ -n "$version_matches" ]; then
+        SUPPORTED_MONGO_VERSION="$version"
+      fi
+    done
+
+    if [ -n "$SUPPORTED_MONGO_VERSION" ]; then
+      echo "Found matching patch MongoDB version $SUPPORTED_MONGO_VERSION"
+
+      WRANGLER_ADDON=$(create_wrangler_addon "$SUPPORTED_MONGO_VERSION")
+
+      ADDON_ID=$(jq -r '.data.id' <<<"$WRANGLER_ADDON")
+      export ADDON_ID
+      STATUS=$(jq -r '.data.status' <<<"$WRANGLER_ADDON")
+
+      if [ -z "$ADDON_ID" ] || [ "$ADDON_ID" == "null" ]; then
+        echo "Could not create patch wrangler addon ($SUPPORTED_MONGO_VERSION) - check NF_API_TOKEN access (create)"
+        echo "Response: $WRANGLER_ADDON"
+        exit 1
+      fi
+
+    else
+      echo "Could not determine supported patch MongoDB version - upgrade required."
+      echo "Response: $WRANGLER_ADDON"
+      exit 1
+    fi
+  else
+    echo "Could not create wrangler addon - check NF_API_TOKEN access (create)"
+    echo "Response: $WRANGLER_ADDON"
+    exit 1
+  fi
 else
   echo "Temporary addon created successfully, status: '$STATUS'"
 fi
