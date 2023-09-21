@@ -61,7 +61,7 @@ STATUS=$(jq -r '.data.status' <<<"$WRANGLER_ADDON")
 
 if [ -z "$ADDON_ID" ] || [ "$ADDON_ID" == "null" ]; then
   # If the error is related to version, we can re-try
-  ADDON_ERROR_IS_VERSION=$(grep "MongoDB version not supported:" <<<"$WRANGLER_ADDON")
+  ADDON_ERROR_IS_VERSION=$(grep "MongoDB. version not supported:" <<<"$WRANGLER_ADDON")
   if [ -n "$ADDON_ERROR_IS_VERSION" ]; then
     echo "Creating addon failed due to version incompatibility - trying to find a supported version"
     SUPPORTED_MONGO_VERSIONS=$(jq -r '.error.details.versions[]' <<<"$WRANGLER_ADDON")
