@@ -47,7 +47,7 @@ create_wrangler_addon() {
       --header "Content-Type: application/json" \
       --header "Authorization: Bearer $NF_API_TOKEN" \
       --request POST \
-      --data '{"name":"'"$WRANGLER_ADDON_NAME"'","description":"Ad-hoc mongo-wrangler db","type":"mongodb","version":"'"$1"'","billing":{"deploymentPlan":"nf-compute-100-4","storageClass":"ssd","storage":4096,"replicas":1}}' \
+      --data '{"name":"'"$WRANGLER_ADDON_NAME"'","description":"Ad-hoc mongo-wrangler db","type":"mongodb","version":"'"$1"'","billing":{"deploymentPlan":"nf-compute-100-4","storageClass":"ssd","storage":8192,"replicas":1}}' \
       "https://api.northflank.com/v1/projects/$NF_PROJECT_ID/addons"
   )
   echo "$wrangler_addon"
