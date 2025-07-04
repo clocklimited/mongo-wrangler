@@ -110,14 +110,12 @@ if (customOnly.length) {
   )
 }
 
-log(color('\n💩\tDumping indexes', 'grey'), color(databaseName, 'yellow'))
-exec(`mongo "${input}" --norc --quiet index-getter.js > indexes`)
 
 log(
   color('✨\tRestoring locally to ', 'grey') + color(newDatabaseName, 'yellow')
 )
 exec(
-  `mongorestore --uri="${output}" --noIndexRestore ${verbose} -d=${newDatabaseName} dump/${inputDatabaseName}`
+  `mongorestore --uri="${output}" ${verbose} -d=${newDatabaseName} dump/${inputDatabaseName}`
 )
 
 log(color('🔏\tObfuscating ' + newDatabaseName, 'grey'))
@@ -131,7 +129,7 @@ log(color('💩\tDumping ' + newDatabaseName, 'grey'))
 exec(`mongodump "${output}" ${verbose} --db ${newDatabaseName}`)
 log(color('🗜\tCompressing and uploading to xfer', 'grey'))
 var url = exec(
-  'tar -cf - dump indexes | zstd | curl --silent -H "Max-Days: 1" -H "Max-Downloads: 50" --upload-file - https://xfer.clock.co.uk/' +
+  'tar -cf - dump | zstd | curl --silent -H "Max-Days: 1" -H "Max-Downloads: 50" --upload-file - https://xfer.clock.co.uk/' +
     filename
 ).toString()
 
