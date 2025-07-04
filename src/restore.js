@@ -102,18 +102,6 @@ if (isDocker) {
       'dump/' +
       dumpName
   )
-  if (!noIndex && exists('./data/db' + tmpPath + 'indexes')) {
-    log('Restoring Indexes')
-    exec(
-      'docker exec ' +
-        containerName +
-        ' mongo --norc ' +
-        databaseName +
-        ' /data/db' +
-        tmpPath +
-        'indexes'
-    )
-  }
 } else {
   exec('mkdir -p ' + tmpPath)
   exec('curl --silent ' + tarUrl + ' | unzstd | tar -xf - -C ' + tmpPath)
@@ -128,10 +116,6 @@ if (isDocker) {
       'dump/' +
       dumpName
   )
-  if (!noIndex && exists(tmpPath + 'indexes')) {
-    log('Restoring Indexes')
-    exec('mongo --norc ' + databaseName + ' ' + tmpPath + 'indexes')
-  }
 }
 log('Clearing up')
 exec('rm -rf ' + tmpPath)
