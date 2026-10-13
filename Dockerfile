@@ -1,10 +1,11 @@
-FROM mongo:5.0.14-focal
+FROM mongo:8.0.32-noble
 
 WORKDIR /usr/src/app
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends nodejs zstd jq curl \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY . .
 
-RUN apt update
-RUN apt -y install nodejs zstd jq curl
-
-CMD [ "/usr/src/app/dump-nf.sh" ]
+CMD ["/usr/src/app/dump-nf.sh"]
